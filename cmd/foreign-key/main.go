@@ -2,14 +2,21 @@ package main
 
 import (
 	"ForeignKey/internal/config"
+	"ForeignKey/internal/logger"
+	l "log"
+	"log/slog"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	_ = cfg
+	log, err := logger.SetupLogger(cfg.Env)
+	if err != nil {
+		l.Fatalf("can't setup logger: %s", err)
+	}
 
-	// TODO: init logger: slog
+	log.Info("starting service", slog.String("env", cfg.Env))
+	log.Debug("debug messages are enabled")
 
 	// TODO: init storage: postgres
 
