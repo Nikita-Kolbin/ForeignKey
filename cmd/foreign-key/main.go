@@ -3,6 +3,7 @@ package main
 import (
 	"ForeignKey/internal/config"
 	"ForeignKey/internal/logger"
+	"ForeignKey/internal/storage/sqlite"
 	l "log"
 	"log/slog"
 )
@@ -18,7 +19,12 @@ func main() {
 	log.Info("starting service", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	// TODO: init storage: postgres
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to initialize storage", slog.String("error", err.Error()))
+	}
+
+	_ = storage
 
 	// TODO: init router: chi, render
 
