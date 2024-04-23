@@ -2,7 +2,7 @@ package main
 
 import (
 	"ForeignKey/internal/config"
-	"ForeignKey/internal/http-server/handlers/hello"
+	"ForeignKey/internal/http-server/handlers/admin"
 	mwLogger "ForeignKey/internal/http-server/middleware/logger"
 	"ForeignKey/internal/logger"
 	"ForeignKey/internal/storage/sqlite"
@@ -11,6 +11,7 @@ import (
 	l "log"
 	"log/slog"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -27,9 +28,8 @@ func main() {
 	storage, err := sqlite.New(cfg.StoragePath)
 	if err != nil {
 		log.Error("failed to initialize storage", slog.String("error", err.Error()))
+		os.Exit(0)
 	}
-
-	_ = storage
 
 	router := chi.NewRouter()
 
@@ -40,7 +40,8 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	// handlers
-	router.Get("/hello/{name}", hello.New(log))
+	router.Post("/api/sign-up", admin.NewSignUp(storage, log))
+	router.Post("/api/sign-in", admin.NewSignIn(storage, log))
 
 	srv := &http.Server{
 		Addr:         cfg.Address,
@@ -51,7 +52,7 @@ func main() {
 	}
 
 	log.Info("starting server", slog.String("addr", cfg.Address))
-	if err := srv.ListenAndServe(); err != nil {
+	if err = srv.ListenAndServe(); err != nil {
 		log.Error("failed to start server")
 	}
 

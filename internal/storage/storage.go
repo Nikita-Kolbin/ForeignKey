@@ -3,5 +3,5 @@ package storage
 import "errors"
 
 var (
-	ErrStorage = errors.New("storage error")
+	ErrUsernameTaken = errors.New("username is already taken")
 )

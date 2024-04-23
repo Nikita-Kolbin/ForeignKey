@@ -29,13 +29,7 @@ func New(storagePath string) (*Storage, error) {
 }
 
 func (s *Storage) initTables() error {
-	q := `
-	CREATE TABLE IF NOT EXISTS test_table (
-		id INTEGER PRIMARY KEY
-	);
-	`
-
-	_, err := s.db.Exec(q)
+	err := s.initAdmins()
 	if err != nil {
 		return err
 	}
