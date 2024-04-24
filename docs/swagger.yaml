@@ -1,0 +1,81 @@
+basePath: /api
+definitions:
+  admin.SignInRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  admin.SignInResponse:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  admin.SignUpRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  title: ForeignKey
+  version: "1.0"
+paths:
+  /admin/sign-in:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: sign in
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/admin.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.SignInResponse'
+      summary: SingIn
+      tags:
+      - auth
+  /admin/sign-up:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: sign up
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/admin.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: SingUp
+      tags:
+      - auth
+swagger: "2.0"

@@ -2,7 +2,7 @@ package admin
 
 import (
 	"ForeignKey/internal/http-server/jwt_token"
-	resp "ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/http-server/response"
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -21,10 +21,17 @@ type SignInRequest struct {
 }
 
 type SignInResponse struct {
-	resp.Response
+	response.Response
 	Token string `json:"token"`
 }
 
+// @Summary      SingIn
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param input body SignInRequest true "sign in"
+// @Success      200  {object}   SignInResponse
+// @Router       /admin/sign-in [post]
 func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.admin.NewSignIn"
@@ -40,14 +47,14 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
 
-			render.JSON(w, r, resp.Error("empty request"))
+			render.JSON(w, r, response.Error("empty request"))
 
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
 
-			render.JSON(w, r, resp.Error("failed to decode request"))
+			render.JSON(w, r, response.Error("failed to decode request"))
 
 			return
 		}
@@ -56,7 +63,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to get admin", slog.String("err", err.Error()))
 
-			render.JSON(w, r, resp.Error("wrong login or password"))
+			render.JSON(w, r, response.Error("wrong login or password"))
 
 			return
 		}
@@ -65,7 +72,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to generate token", slog.String("err", err.Error()))
 
-			render.JSON(w, r, resp.Error("failed to generate token"))
+			render.JSON(w, r, response.Error("failed to generate token"))
 
 			return
 		}
@@ -78,7 +85,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 
 func responseOK(token string) SignInResponse {
 	return SignInResponse{
-		Response: resp.OK(),
+		Response: response.OK(),
 		Token:    token,
 	}
 }

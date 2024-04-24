@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	tokenTTL  = 12 * time.Hour
+	tokenTTL = 12 * time.Hour
+
+	// TODO: вынести ключ в переменнцю окружения
 	signedKey = "very_secret_key"
 )
 

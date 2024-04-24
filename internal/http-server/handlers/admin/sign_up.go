@@ -1,7 +1,7 @@
 package admin
 
 import (
-	resp "ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/http-server/response"
 	"ForeignKey/internal/storage"
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
@@ -20,6 +20,13 @@ type SignUpRequest struct {
 	Password string `json:"password"`
 }
 
+// @Summary      SingUp
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param input body SignUpRequest true "sign up"
+// @Success      200  {object}   response.Response
+// @Router       /admin/sign-up [post]
 func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.admin.NewSignUp"
@@ -35,14 +42,14 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
 
-			render.JSON(w, r, resp.Error("empty request"))
+			render.JSON(w, r, response.Error("empty request"))
 
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
 
-			render.JSON(w, r, resp.Error("failed to decode request"))
+			render.JSON(w, r, response.Error("failed to decode request"))
 
 			return
 		}
@@ -51,20 +58,20 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 		if errors.Is(err, storage.ErrUsernameTaken) {
 			log.Error("username is already taken", slog.String("username", req.Username))
 
-			render.JSON(w, r, resp.Error("username is already taken"))
+			render.JSON(w, r, response.Error("username is already taken"))
 
 			return
 		}
 		if err != nil {
 			log.Error("failed to create admin", slog.String("err", err.Error()))
 
-			render.JSON(w, r, resp.Error("failed to create admin"))
+			render.JSON(w, r, response.Error("failed to create admin"))
 
 			return
 		}
 
 		log.Info("admin created", slog.String("username", req.Username))
 
-		render.JSON(w, r, resp.OK())
+		render.JSON(w, r, response.OK())
 	}
 }

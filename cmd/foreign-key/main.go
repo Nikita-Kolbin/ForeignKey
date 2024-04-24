@@ -1,18 +1,28 @@
 package main
 
 import (
+	"log/slog"
+	"net/http"
+	"os"
+
+	_ "ForeignKey/docs"
 	"ForeignKey/internal/config"
 	"ForeignKey/internal/http-server/handlers/admin"
 	mwLogger "ForeignKey/internal/http-server/middleware/logger"
 	"ForeignKey/internal/logger"
 	"ForeignKey/internal/storage/sqlite"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 	l "log"
-	"log/slog"
-	"net/http"
-	"os"
 )
+
+// @title           ForeignKey
+// @version         1.0
+
+// @host      localhost:8082
+// @BasePath  /api
 
 func main() {
 	cfg := config.MustLoad()
@@ -40,8 +50,13 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	// handlers
-	router.Post("/api/sign-up", admin.NewSignUp(storage, log))
-	router.Post("/api/sign-in", admin.NewSignIn(storage, log))
+	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
+	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
+
+	// swagger
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8082/swagger/doc.json"),
+	))
 
 	srv := &http.Server{
 		Addr:         cfg.Address,
