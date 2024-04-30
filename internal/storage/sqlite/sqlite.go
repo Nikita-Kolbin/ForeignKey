@@ -29,9 +29,20 @@ func New(storagePath string) (*Storage, error) {
 }
 
 func (s *Storage) initTables() error {
-	err := s.initAdmins()
-	if err != nil {
-		return err
+	if err := s.initAdmins(); err != nil {
+		return fmt.Errorf("can't init admins: %w", err)
+	}
+
+	if err := s.initWebsites(); err != nil {
+		return fmt.Errorf("can't init websites: %w", err)
+	}
+
+	if err := s.initCustomers(); err != nil {
+		return fmt.Errorf("can't init customers: %w", err)
+	}
+
+	if err := s.initImages(); err != nil {
+		return fmt.Errorf("can't init images: %w", err)
 	}
 
 	return nil

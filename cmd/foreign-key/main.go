@@ -1,6 +1,8 @@
 package main
 
 import (
+	img "ForeignKey/internal/http-server/handlers/image"
+	"ForeignKey/internal/storage/image"
 	"log/slog"
 	"net/http"
 	"os"
@@ -25,19 +27,28 @@ import (
 // @BasePath  /api
 
 func main() {
+	// config
 	cfg := config.MustLoad()
 
+	// logger
 	log, err := logger.SetupLogger(cfg.Env)
 	if err != nil {
 		l.Fatalf("can't setup logger: %s", err)
 	}
-
 	log.Info("starting service", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
+	// storage
 	storage, err := sqlite.New(cfg.StoragePath)
 	if err != nil {
 		log.Error("failed to initialize storage", slog.String("error", err.Error()))
+		os.Exit(0)
+	}
+
+	// image saver
+	imageSaver, err := image.New(cfg.ImagesPath)
+	if err != nil {
+		log.Error("failed to initialize image saver", slog.String("error", err.Error()))
 		os.Exit(0)
 	}
 
@@ -52,6 +63,9 @@ func main() {
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
+	// TODO: Подключить к сваггеру
+	router.Post("/api/image/upload", img.NewUpload(imageSaver, storage, log))
+	router.Get("/api/image/download/{id}", img.NewDownload(imageSaver, storage, log))
 
 	// swagger
 	router.Get("/swagger/*", httpSwagger.Handler(

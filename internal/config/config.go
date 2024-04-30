@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Env         string `yaml:"env" env-required:"true"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
+	ImagesPath  string `yaml:"images_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
 }
 
@@ -20,10 +21,12 @@ type HTTPServer struct {
 }
 
 func MustLoad() *Config {
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath == "" {
-		log.Fatal("CONFIG_PATH is not set")
-	}
+	//configPath := os.Getenv("CONFIG_PATH")
+	//if configPath == "" {
+	//	log.Fatal("CONFIG_PATH is not set")
+	//}
+
+	configPath := "./config/local.yaml"
 
 	// check file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {

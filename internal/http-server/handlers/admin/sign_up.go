@@ -20,6 +20,7 @@ type SignUpRequest struct {
 	Password string `json:"password"`
 }
 
+// NewSignUp godoc
 // @Summary      SingUp
 // @Tags         auth
 // @Accept       json

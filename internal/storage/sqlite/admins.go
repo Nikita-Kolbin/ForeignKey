@@ -51,8 +51,7 @@ func (s *Storage) GetAdminId(username, password string) (int, error) {
 	row := s.db.QueryRow(q, username, generatePasswordHash(password))
 
 	var id int
-	err := row.Scan(&id)
-	if err != nil {
+	if err := row.Scan(&id); err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 

@@ -25,6 +25,7 @@ type SignInResponse struct {
 	Token string `json:"token"`
 }
 
+// NewSignIn godoc
 // @Summary      SingIn
 // @Tags         auth
 // @Accept       json
