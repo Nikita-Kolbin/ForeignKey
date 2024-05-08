@@ -2,6 +2,7 @@ package main
 
 import (
 	img "ForeignKey/internal/http-server/handlers/image"
+	"ForeignKey/internal/http-server/handlers/website"
 	"ForeignKey/internal/storage/image"
 	"log/slog"
 	"net/http"
@@ -25,6 +26,10 @@ import (
 
 // @host      localhost:8082
 // @BasePath  /api
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 func main() {
 	// config
@@ -60,18 +65,23 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
+	// TODO: указать статусы для всех ответов
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
-	// TODO: Подключить к сваггеру
+
 	router.Post("/api/image/upload", img.NewUpload(imageSaver, storage, log))
 	router.Get("/api/image/download/{id}", img.NewDownload(imageSaver, storage, log))
+
+	router.Post("/api/website/create", website.NewCreate(storage, log))
+	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
 
 	// swagger
 	router.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8082/swagger/doc.json"),
 	))
 
+	// server
 	srv := &http.Server{
 		Addr:         cfg.Address,
 		Handler:      router,

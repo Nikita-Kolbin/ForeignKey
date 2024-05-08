@@ -24,14 +24,16 @@ type UploadResponse struct {
 	Id int `json:"id"`
 }
 
-// NewSignIn godoc
-// @Summary      SingIn
-// @Tags         auth
-// @Accept       json
+// NewUpload godoc
+// @Summary      UploadImage
+// @Description  В боди должна быть картинка в виде массива байт
+// @Tags         files
+// @Accept       jpeg
+// @Accept       png
 // @Produce      json
-// @Param input body SignInRequest true "sign in"
-// @Success      200  {object}   SignInResponse
-// @Router       /admin/sign-in [post]
+// @Param input body []byte true "byte image"
+// @Success      200  {object}   UploadResponse
+// @Router       /image/upload [post]
 func NewUpload(imagesSever ImagesSaver, imagesCreator ImagesCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.image.NewUpload"

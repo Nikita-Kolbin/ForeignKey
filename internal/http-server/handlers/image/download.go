@@ -18,6 +18,16 @@ type ImagesPathGetter interface {
 	GetImagePath(id int) (string, error)
 }
 
+// NewDownload godoc
+// @Summary      DownloadImage
+// @Description  При удачном запросе вернет картинку в body со статусом 200, при неудачном json с ошибкой
+// @Tags         files
+// @Produce      jpeg
+// @Produce      png
+// @Produce      json
+// @Param id path int true "image id"
+// @Success      200  {object}   []byte
+// @Router       /image/download/{id} [get]
 func NewDownload(ig ImagesGetter, ipg ImagesPathGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.image.NewDownload"

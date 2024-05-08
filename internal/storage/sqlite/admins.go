@@ -11,7 +11,7 @@ func (s *Storage) initAdmins() error {
 	q := `
 	CREATE TABLE IF NOT EXISTS admins (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		username TEXT UNIQUE,
+		login TEXT UNIQUE,
 		password_hash TEXT
 	);
 	`
@@ -24,14 +24,14 @@ func (s *Storage) initAdmins() error {
 	return nil
 }
 
-func (s *Storage) CreateAdmin(username, password string) error {
+func (s *Storage) CreateAdmin(login, password string) error {
 	const op = "storage.sqlite.CreateAdmin"
 
-	q := `INSERT INTO admins (username, password_hash) VALUES (?, ?)`
+	q := `INSERT INTO admins (login, password_hash) VALUES (?, ?)`
 
 	hash := generatePasswordHash(password)
 
-	_, err := s.db.Exec(q, username, hash)
+	_, err := s.db.Exec(q, login, hash)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", op, storage.ErrUsernameTaken)
@@ -43,12 +43,12 @@ func (s *Storage) CreateAdmin(username, password string) error {
 	return nil
 }
 
-func (s *Storage) GetAdminId(username, password string) (int, error) {
+func (s *Storage) GetAdminId(login, password string) (int, error) {
 	const op = "storage.sqlite.AdminIsExists"
 
-	q := `SELECT id FROM admins WHERE username=? AND password_hash=?`
+	q := `SELECT id FROM admins WHERE login=? AND password_hash=?`
 
-	row := s.db.QueryRow(q, username, generatePasswordHash(password))
+	row := s.db.QueryRow(q, login, generatePasswordHash(password))
 
 	var id int
 	if err := row.Scan(&id); err != nil {

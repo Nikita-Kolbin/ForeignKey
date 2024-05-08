@@ -16,7 +16,7 @@ type AdminsGetter interface {
 }
 
 type SignInRequest struct {
-	Username string `json:"username"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -60,7 +60,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := ac.GetAdminId(req.Username, req.Password)
+		id, err := ac.GetAdminId(req.Login, req.Password)
 		if err != nil {
 			log.Error("failed to get admin", slog.String("err", err.Error()))
 
@@ -78,7 +78,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("admin sing in", slog.String("username", req.Username))
+		log.Info("admin sing in", slog.String("login", req.Login))
 
 		render.JSON(w, r, responseOK(t))
 	}

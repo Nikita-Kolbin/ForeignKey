@@ -2,9 +2,9 @@ basePath: /api
 definitions:
   admin.SignInRequest:
     properties:
-      password:
+      login:
         type: string
-      username:
+      password:
         type: string
     type: object
   admin.SignInResponse:
@@ -18,9 +18,18 @@ definitions:
     type: object
   admin.SignUpRequest:
     properties:
+      login:
+        type: string
       password:
         type: string
-      username:
+    type: object
+  image.UploadResponse:
+    properties:
+      error:
+        type: string
+      id:
+        type: integer
+      status:
         type: string
     type: object
   response.Response:
@@ -28,6 +37,22 @@ definitions:
       error:
         type: string
       status:
+        type: string
+    type: object
+  website.AliasesResponse:
+    properties:
+      aliases:
+        items:
+          type: string
+        type: array
+      error:
+        type: string
+      status:
+        type: string
+    type: object
+  website.CreateRequest:
+    properties:
+      alias:
         type: string
     type: object
 host: localhost:8082
@@ -78,4 +103,95 @@ paths:
       summary: SingUp
       tags:
       - auth
+  /image/download/{id}:
+    get:
+      description: При удачном запросе вернет картинку в body со статусом 200, при
+        неудачном json с ошибкой
+      parameters:
+      - description: image id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - image/jpeg
+      - image/png
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+      summary: DownloadImage
+      tags:
+      - files
+  /image/upload:
+    post:
+      consumes:
+      - image/jpeg
+      - image/png
+      description: В боди должна быть картинка в виде массива байт
+      parameters:
+      - description: byte image
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/image.UploadResponse'
+      summary: UploadImage
+      tags:
+      - files
+  /website/aliases:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/website.AliasesResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all users aliases
+      tags:
+      - website
+  /website/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: alias new website
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/website.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create website
+      tags:
+      - website
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

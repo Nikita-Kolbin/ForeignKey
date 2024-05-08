@@ -76,7 +76,6 @@ func (i *Image) createDir(dir string) {
 	_ = os.MkdirAll(path.Join(i.path, dir), os.ModePerm)
 }
 
-// TODO: Обработка расширения
 func generateRandomName(extension string) string {
 	name := ""
 	for i := 0; i < 15; i++ {

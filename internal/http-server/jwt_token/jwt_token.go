@@ -1,7 +1,10 @@
 package jwt_token
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -27,4 +30,32 @@ func GenerateToken(id int) (string, error) {
 	})
 
 	return token.SignedString([]byte(signedKey))
+}
+
+func ParseToken(t string) (int, error) {
+	token, err := jwt.ParseWithClaims(t, &claimsWithId{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signin method")
+		}
+		return []byte(signedKey), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(*claimsWithId)
+	if !ok {
+		return 0, fmt.Errorf("invalid token claims")
+	}
+
+	return claims.Id, nil
+}
+
+func GetTokenFromRequest(r *http.Request) (string, error) {
+	auth := r.Header.Get("Authorization")
+	authParts := strings.Split(auth, " ")
+	if len(authParts) != 2 {
+		return "", fmt.Errorf("invalid token")
+	}
+	return authParts[1], nil
 }

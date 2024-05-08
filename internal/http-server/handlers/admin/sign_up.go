@@ -16,7 +16,7 @@ type AdminsCreator interface {
 }
 
 type SignUpRequest struct {
-	Username string `json:"username"`
+	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
@@ -55,9 +55,9 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = ac.CreateAdmin(req.Username, req.Password)
+		err = ac.CreateAdmin(req.Login, req.Password)
 		if errors.Is(err, storage.ErrUsernameTaken) {
-			log.Error("username is already taken", slog.String("username", req.Username))
+			log.Error("login is already taken", slog.String("username", req.Login))
 
 			render.JSON(w, r, response.Error("username is already taken"))
 
@@ -71,7 +71,7 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("admin created", slog.String("username", req.Username))
+		log.Info("admin created", slog.String("login", req.Login))
 
 		render.JSON(w, r, response.OK())
 	}
