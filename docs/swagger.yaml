@@ -23,6 +23,33 @@ definitions:
       password:
         type: string
     type: object
+  customer.SignInRequest:
+    properties:
+      alias:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  customer.SignInResponse:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  customer.SignUpRequest:
+    properties:
+      alias:
+        type: string
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   image.UploadResponse:
     properties:
       error:
@@ -31,6 +58,24 @@ definitions:
         type: integer
       status:
         type: string
+    type: object
+  product.CreateRequest:
+    properties:
+      alias:
+        type: string
+      product_info:
+        $ref: '#/definitions/product.ProductInfo'
+    type: object
+  product.ProductInfo:
+    properties:
+      description:
+        type: string
+      image_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
     type: object
   response.Response:
     properties:
@@ -79,7 +124,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/admin.SignInResponse'
-      summary: SingIn
+      summary: SingIn admin
       tags:
       - auth
   /admin/sign-up:
@@ -100,7 +145,49 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.Response'
-      summary: SingUp
+      summary: SingUp admin
+      tags:
+      - auth
+  /customer/sign-in:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: sign in
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/customer.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/customer.SignInResponse'
+      summary: SingIn customer
+      tags:
+      - auth
+  /customer/sign-up:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: sign up
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/customer.SignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: SingUp customer
       tags:
       - auth
   /image/download/{id}:
@@ -152,6 +239,29 @@ paths:
       summary: UploadImage
       tags:
       - files
+  /product/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: alias new website
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/product.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create product
+      tags:
+      - product
   /website/aliases:
     get:
       produces:

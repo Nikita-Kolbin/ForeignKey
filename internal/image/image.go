@@ -33,7 +33,7 @@ func (i *Image) Save(img []byte, extension string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("%s: can't create image: %w", op, err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	_, err = f.Write(img)
 	if err != nil {

@@ -65,3 +65,17 @@ func (s *Storage) GetWebsitesAliases(adminId int) ([]string, error) {
 
 	return res, nil
 }
+
+func (s *Storage) GetWebsite(alias string) (websiteId, adminId int, err error) {
+	const op = "storage.sqlite.GetWebsite"
+
+	q := `SELECT id, admin_id FROM websites WHERE alias=?`
+
+	row := s.db.QueryRow(q, alias)
+
+	if err = row.Scan(&websiteId, &adminId); err != nil {
+		return 0, 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return websiteId, adminId, nil
+}

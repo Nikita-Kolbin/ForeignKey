@@ -1,9 +1,11 @@
 package main
 
 import (
+	"ForeignKey/internal/http-server/handlers/customer"
 	img "ForeignKey/internal/http-server/handlers/image"
+	"ForeignKey/internal/http-server/handlers/product"
 	"ForeignKey/internal/http-server/handlers/website"
-	"ForeignKey/internal/storage/image"
+	"ForeignKey/internal/image"
 	"log/slog"
 	"net/http"
 	"os"
@@ -66,6 +68,7 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	// TODO: указать статусы для всех ответов
+	// TODO: поменять некоторык еррор логги на инфо
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
@@ -75,6 +78,11 @@ func main() {
 
 	router.Post("/api/website/create", website.NewCreate(storage, log))
 	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
+
+	router.Post("/api/product/create", product.NewCreate(storage, log))
+
+	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
+	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
 
 	// swagger
 	router.Get("/swagger/*", httpSwagger.Handler(

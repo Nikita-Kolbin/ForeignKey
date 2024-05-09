@@ -1,4 +1,4 @@
-package admin
+package customer
 
 import (
 	"ForeignKey/internal/http-server/response"
@@ -11,26 +11,28 @@ import (
 	"net/http"
 )
 
-type AdminsCreator interface {
-	CreateAdmin(username, password string) error
+type CustomersCreator interface {
+	CreateCustomers(websiteId int, login, password string) error
+	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
 type SignUpRequest struct {
+	Alias    string `json:"alias"`
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
 
 // NewSignUp godoc
-// @Summary      SingUp admin
+// @Summary      SingUp customer
 // @Tags         auth
 // @Accept       json
 // @Produce      json
 // @Param input body SignUpRequest true "sign up"
 // @Success      200  {object}   response.Response
-// @Router       /admin/sign-up [post]
-func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
+// @Router       /customer/sign-up [post]
+func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.admin.NewSignUp"
+		const op = "handlers.customer.NewSignUp"
 
 		log = log.With(
 			slog.String("op", op),
@@ -55,7 +57,16 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = ac.CreateAdmin(req.Login, req.Password)
+		websiteId, _, err := cc.GetWebsite(req.Alias)
+		if err != nil {
+			log.Error("failed to get website", slog.String("err", err.Error()))
+
+			render.JSON(w, r, response.Error("failed to find website"))
+
+			return
+		}
+
+		err = cc.CreateCustomers(websiteId, req.Login, req.Password)
 		if errors.Is(err, storage.ErrLoginTaken) {
 			log.Error("login is already taken", slog.String("login", req.Login))
 
@@ -64,14 +75,14 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			log.Error("failed to create admin", slog.String("err", err.Error()))
+			log.Error("failed to create customer", slog.String("err", err.Error()))
 
-			render.JSON(w, r, response.Error("failed to create admin"))
+			render.JSON(w, r, response.Error("failed to create customer"))
 
 			return
 		}
 
-		log.Info("admin created", slog.String("login", req.Login))
+		log.Info("customer created", slog.String("login", req.Login))
 
 		render.JSON(w, r, response.OK())
 	}

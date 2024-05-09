@@ -1,9 +1,8 @@
-package website
+package product
 
 import (
 	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
-	"ForeignKey/internal/storage"
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -12,26 +11,35 @@ import (
 	"net/http"
 )
 
-type WebsitesCreator interface {
-	CreateWebsite(alias string, adminId int) error
+type ProductsCreator interface {
+	CreateProduct(name, description string, websiteId, price, imageId int) error
+	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
 type CreateRequest struct {
-	Alias string `json:"alias"`
+	Alias       string      `json:"alias"`
+	ProductInfo ProductInfo `json:"product_info"`
+}
+
+type ProductInfo struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
+	ImageId     int    `json:"image_id"`
 }
 
 // NewCreate godoc
-// @Summary Create website
+// @Summary Create product
 // @Security ApiKeyAuth
-// @Tags website
+// @Tags product
 // @Accept json
 // @Produce  json
 // @Param input body CreateRequest true "alias new website"
 // @Success 200 {object} response.Response
-// @Router /website/create [post]
-func NewCreate(wc WebsitesCreator, log *slog.Logger) http.HandlerFunc {
+// @Router /product/create [post]
+func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.website.NewCreate"
+		const op = "handlers.products.NewCreate"
 
 		log = log.With(
 			slog.String("op", op),
@@ -82,23 +90,34 @@ func NewCreate(wc WebsitesCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = wc.CreateWebsite(req.Alias, id)
-		if errors.Is(err, storage.ErrAliasTaken) {
-			log.Error("alias already taken", slog.String("err", err.Error()))
-
-			render.JSON(w, r, response.Error("alias already taken"))
-
-			return
-		}
+		websiteId, adminId, err := pc.GetWebsite(req.Alias)
 		if err != nil {
-			log.Error("failed to create website", slog.String("err", err.Error()))
+			log.Error("failed to get website", slog.String("err", err.Error()))
 
-			render.JSON(w, r, response.Error("failed to create website"))
+			render.JSON(w, r, response.Error("failed to find website"))
 
 			return
 		}
 
-		log.Info("website created", slog.String("alias", req.Alias))
+		if adminId != id {
+			log.Error("admin is not owner", slog.String("err", err.Error()))
+
+			render.JSON(w, r, response.Error("admin is not owner"))
+
+			return
+		}
+
+		pi := req.ProductInfo
+		err = pc.CreateProduct(pi.Name, pi.Description, websiteId, pi.Price, pi.ImageId)
+		if err != nil {
+			log.Error("failed to create product", slog.String("err", err.Error()))
+
+			render.JSON(w, r, response.Error("failed to create product"))
+
+			return
+		}
+
+		log.Info("product created", slog.String("website alias", req.Alias))
 
 		render.JSON(w, r, response.OK())
 	}

@@ -45,5 +45,9 @@ func (s *Storage) initTables() error {
 		return fmt.Errorf("can't init images: %w", err)
 	}
 
+	if err := s.initProducts(); err != nil {
+		return fmt.Errorf("can't init products: %w", err)
+	}
+
 	return nil
 }

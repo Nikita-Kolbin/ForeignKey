@@ -34,7 +34,8 @@ func NewGetAliases(ag AliasesGetter, log *slog.Logger) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		token, err := jwt_token.GetTokenFromRequest(r)
+		auth := r.Header.Get("Authorization")
+		token, err := jwt_token.GetTokenFromRequest(auth)
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
 
@@ -45,11 +46,18 @@ func NewGetAliases(ag AliasesGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := jwt_token.ParseToken(token)
+		id, role, _, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
 
 			render.JSON(w, r, response.Error("invalid token"))
+
+			return
+		}
+		if role != jwt_token.RoleAdmin {
+			log.Info("permission denied", slog.String("role", role))
+
+			render.JSON(w, r, response.Error("permission denied"))
 
 			return
 		}

@@ -34,7 +34,7 @@ func (s *Storage) CreateAdmin(login, password string) error {
 	_, err := s.db.Exec(q, login, hash)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return fmt.Errorf("%s: %w", op, storage.ErrUsernameTaken)
+			return fmt.Errorf("%s: %w", op, storage.ErrLoginTaken)
 		}
 
 		return fmt.Errorf("%s: %w", op, err)
@@ -44,7 +44,7 @@ func (s *Storage) CreateAdmin(login, password string) error {
 }
 
 func (s *Storage) GetAdminId(login, password string) (int, error) {
-	const op = "storage.sqlite.AdminIsExists"
+	const op = "storage.sqlite.GetAdminId"
 
 	q := `SELECT id FROM admins WHERE login=? AND password_hash=?`
 

@@ -1,4 +1,4 @@
-package admin
+package customer
 
 import (
 	"ForeignKey/internal/http-server/jwt_token"
@@ -11,11 +11,13 @@ import (
 	"net/http"
 )
 
-type AdminsGetter interface {
-	GetAdminId(username, password string) (int, error)
+type CustomersGetter interface {
+	GetCustomerId(websiteId int, login, password string) (int, error)
+	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
 type SignInRequest struct {
+	Alias    string `json:"alias"`
 	Login    string `json:"login"`
 	Password string `json:"password"`
 }
@@ -26,16 +28,16 @@ type SignInResponse struct {
 }
 
 // NewSignIn godoc
-// @Summary      SingIn admin
+// @Summary      SingIn customer
 // @Tags         auth
 // @Accept       json
 // @Produce      json
 // @Param input body SignInRequest true "sign in"
 // @Success      200  {object}   SignInResponse
-// @Router       /admin/sign-in [post]
-func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
+// @Router       /customer/sign-in [post]
+func NewSignIn(cg CustomersGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.admin.NewSignIn"
+		const op = "handlers.customer.NewSignIn"
 
 		log = log.With(
 			slog.String("op", op),
@@ -60,16 +62,25 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := ac.GetAdminId(req.Login, req.Password)
+		websiteId, _, err := cg.GetWebsite(req.Alias)
 		if err != nil {
-			log.Error("failed to get admin", slog.String("err", err.Error()))
+			log.Error("failed to get website", slog.String("err", err.Error()))
+
+			render.JSON(w, r, response.Error("failed to find website"))
+
+			return
+		}
+
+		id, err := cg.GetCustomerId(websiteId, req.Login, req.Password)
+		if err != nil {
+			log.Error("failed to get customer", slog.String("err", err.Error()))
 
 			render.JSON(w, r, response.Error("wrong login or password"))
 
 			return
 		}
 
-		t, err := jwt_token.GenerateToken(id, jwt_token.RoleAdmin, "")
+		t, err := jwt_token.GenerateToken(id, jwt_token.RoleCustomer, req.Alias)
 		if err != nil {
 			log.Error("failed to generate token", slog.String("err", err.Error()))
 
@@ -78,7 +89,7 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("admin sing in", slog.String("login", req.Login))
+		log.Info("customer sing in", slog.String("login", req.Login))
 
 		render.JSON(w, r, responseOK(t))
 	}
