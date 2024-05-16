@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ForeignKey/internal/http-server/handlers/cart"
 	"ForeignKey/internal/http-server/handlers/customer"
 	img "ForeignKey/internal/http-server/handlers/image"
 	"ForeignKey/internal/http-server/handlers/product"
@@ -80,13 +81,17 @@ func main() {
 	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
 
 	router.Post("/api/product/create", product.NewCreate(storage, log))
+	router.Get("/api/product/get-by-alias/{alias}", product.NewGetByAlias(storage, log))
 
 	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
 
+	router.Post("/api/cart/add", cart.NewAdd(storage, log))
+	router.Get("/api/cart/get", cart.NewGet(storage, log))
+
 	// swagger
 	router.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8082/swagger/doc.json"),
+		httpSwagger.URL(cfg.Address+"/swagger/doc.json"),
 	))
 
 	// server

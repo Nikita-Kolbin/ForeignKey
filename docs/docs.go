@@ -81,6 +81,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/cart/add": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Добавляет товар в корзину, если товар уже в корзине, увеличивает количество",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Create curt item",
+                "parameters": [
+                    {
+                        "description": "product id and count",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cart.AddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/get": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Get all cart items",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cart.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/customer/sign-in": {
             "post": {
                 "consumes": [
@@ -257,6 +320,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/product/get-by-alias/{alias}": {
+            "get": {
+                "description": "Возвращает все товары сайта по алиасу",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "GetByAlias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/product.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/website/aliases": {
             "get": {
                 "security": [
@@ -357,6 +449,34 @@ const docTemplate = `{
                 }
             }
         },
+        "cart.AddRequest": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "cart.GetResponse": {
+            "type": "object",
+            "properties": {
+                "cart_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.CartItem"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "customer.SignInRequest": {
             "type": "object",
             "properties": {
@@ -420,11 +540,28 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "product_info": {
-                    "$ref": "#/definitions/product.ProductInfo"
+                    "$ref": "#/definitions/product.Info"
                 }
             }
         },
-        "product.ProductInfo": {
+        "product.GetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.ProductInfo"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "product.Info": {
             "type": "object",
             "properties": {
                 "description": {
@@ -449,6 +586,46 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "storage.CartItem": {
+            "type": "object",
+            "properties": {
+                "cart_id": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "product": {
+                    "$ref": "#/definitions/storage.ProductInfo"
+                }
+            }
+        },
+        "storage.ProductInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "website_id": {
+                    "type": "integer"
                 }
             }
         },

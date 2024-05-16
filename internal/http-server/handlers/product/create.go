@@ -17,11 +17,11 @@ type ProductsCreator interface {
 }
 
 type CreateRequest struct {
-	Alias       string      `json:"alias"`
-	ProductInfo ProductInfo `json:"product_info"`
+	Alias       string `json:"alias"`
+	ProductInfo Info   `json:"product_info"`
 }
 
-type ProductInfo struct {
+type Info struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`

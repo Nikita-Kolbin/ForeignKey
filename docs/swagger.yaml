@@ -23,6 +23,24 @@ definitions:
       password:
         type: string
     type: object
+  cart.AddRequest:
+    properties:
+      count:
+        type: integer
+      product_id:
+        type: integer
+    type: object
+  cart.GetResponse:
+    properties:
+      cart_items:
+        items:
+          $ref: '#/definitions/storage.CartItem'
+        type: array
+      error:
+        type: string
+      status:
+        type: string
+    type: object
   customer.SignInRequest:
     properties:
       alias:
@@ -64,9 +82,20 @@ definitions:
       alias:
         type: string
       product_info:
-        $ref: '#/definitions/product.ProductInfo'
+        $ref: '#/definitions/product.Info'
     type: object
-  product.ProductInfo:
+  product.GetResponse:
+    properties:
+      error:
+        type: string
+      products:
+        items:
+          $ref: '#/definitions/storage.ProductInfo'
+        type: array
+      status:
+        type: string
+    type: object
+  product.Info:
     properties:
       description:
         type: string
@@ -83,6 +112,32 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  storage.CartItem:
+    properties:
+      cart_id:
+        type: integer
+      count:
+        type: integer
+      id:
+        type: integer
+      product:
+        $ref: '#/definitions/storage.ProductInfo'
+    type: object
+  storage.ProductInfo:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      image_id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      website_id:
+        type: integer
     type: object
   website.AliasesResponse:
     properties:
@@ -148,6 +203,45 @@ paths:
       summary: SingUp admin
       tags:
       - auth
+  /cart/add:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет товар в корзину, если товар уже в корзине, увеличивает
+        количество
+      parameters:
+      - description: product id and count
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/cart.AddRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create curt item
+      tags:
+      - cart
+  /cart/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cart.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all cart items
+      tags:
+      - cart
   /customer/sign-in:
     post:
       consumes:
@@ -260,6 +354,25 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create product
+      tags:
+      - product
+  /product/get-by-alias/{alias}:
+    get:
+      description: Возвращает все товары сайта по алиасу
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/product.GetResponse'
+      summary: GetByAlias
       tags:
       - product
   /website/aliases:

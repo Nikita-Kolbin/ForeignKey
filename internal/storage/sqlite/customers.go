@@ -29,7 +29,12 @@ func (s *Storage) initCustomers() error {
 func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
 	const op = "storage.sqlite.CreateCustomers"
 
-	q := `INSERT INTO customers (website_id, login, password_hash) VALUES (?, ?, ?)`
+	q := `INSERT INTO customers (website_id, login, password_hash) VALUES (?, ?, ?);`
+
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
 
 	e, err := s.CustomerIsExists(websiteId, login)
 	if err != nil {
@@ -41,8 +46,22 @@ func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
 
 	hash := generatePasswordHash(password)
 
-	_, err = s.db.Exec(q, websiteId, login, hash)
+	res, err := tx.Exec(q, websiteId, login, hash)
 	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	customerId, err := res.LastInsertId()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = s.CreateCart(tx, int(customerId)); err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 

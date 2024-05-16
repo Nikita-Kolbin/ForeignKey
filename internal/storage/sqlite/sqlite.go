@@ -49,5 +49,13 @@ func (s *Storage) initTables() error {
 		return fmt.Errorf("can't init products: %w", err)
 	}
 
+	if err := s.initCarts(); err != nil {
+		return fmt.Errorf("can't init carts: %w", err)
+	}
+
+	if err := s.initCartItems(); err != nil {
+		return fmt.Errorf("can't init cart_items: %w", err)
+	}
+
 	return nil
 }
