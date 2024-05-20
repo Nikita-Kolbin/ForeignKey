@@ -62,6 +62,7 @@ func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
 	}
 
 	if err = tx.Commit(); err != nil {
+		_ = tx.Rollback()
 		return fmt.Errorf("%s: %w", op, err)
 	}
 

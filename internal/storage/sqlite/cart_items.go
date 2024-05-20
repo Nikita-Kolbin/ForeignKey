@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"ForeignKey/internal/storage"
+	"database/sql"
 	"fmt"
 )
 
@@ -78,6 +79,20 @@ func (s *Storage) AddCartItemCount(cartId, productId, count int) error {
 	return nil
 }
 
+func (s *Storage) ChangeCartItemCount(cartId, productId, newCount int) error {
+	const op = "storage.sqlite.AddCartItemCount"
+
+	q := `UPDATE cart_items SET count = ? WHERE cart_id=? AND product_id=?`
+
+	_, err := s.db.Exec(q, newCount, cartId, productId)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
 func (s *Storage) GetCartItems(cartId int) ([]storage.CartItem, error) {
 	const op = "storage.sqlite.GetCartItems"
 
@@ -111,4 +126,30 @@ func (s *Storage) GetCartItems(cartId int) ([]storage.CartItem, error) {
 	}
 
 	return res, nil
+}
+
+func (s *Storage) DeleteCartItem(id int) error {
+	const op = "storage.sqlite.DeleteCartItem"
+
+	q := `DELETE FROM cart_items WHERE id=?`
+
+	_, err := s.db.Exec(q, id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) DeleteCartItemWithTx(tx *sql.Tx, id int) error {
+	const op = "storage.sqlite.DeleteCartItemWithTx"
+
+	q := `DELETE FROM cart_items WHERE id=?`
+
+	_, err := tx.Exec(q, id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }

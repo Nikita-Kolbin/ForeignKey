@@ -30,6 +30,13 @@ definitions:
       product_id:
         type: integer
     type: object
+  cart.ChangeCountRequest:
+    properties:
+      new_count:
+        type: integer
+      product_id:
+        type: integer
+    type: object
   cart.GetResponse:
     properties:
       cart_items:
@@ -77,6 +84,17 @@ definitions:
       status:
         type: string
     type: object
+  order.GetResponse:
+    properties:
+      error:
+        type: string
+      orders:
+        items:
+          $ref: '#/definitions/storage.Order'
+        type: array
+      status:
+        type: string
+    type: object
   product.CreateRequest:
     properties:
       alias:
@@ -120,6 +138,24 @@ definitions:
       count:
         type: integer
       id:
+        type: integer
+      product:
+        $ref: '#/definitions/storage.ProductInfo'
+    type: object
+  storage.Order:
+    properties:
+      order_items:
+        items:
+          $ref: '#/definitions/storage.OrderItem'
+        type: array
+    type: object
+  storage.OrderItem:
+    properties:
+      count:
+        type: integer
+      id:
+        type: integer
+      order_id:
         type: integer
       product:
         $ref: '#/definitions/storage.ProductInfo'
@@ -225,7 +261,31 @@ paths:
             $ref: '#/definitions/response.Response'
       security:
       - ApiKeyAuth: []
-      summary: Create curt item
+      summary: Create cart item
+      tags:
+      - cart
+  /cart/change-count:
+    post:
+      consumes:
+      - application/json
+      description: Изменяет кол-во товара в корзине на new_count
+      parameters:
+      - description: product id and count
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/cart.ChangeCountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change count curt item
       tags:
       - cart
   /cart/get:
@@ -333,6 +393,35 @@ paths:
       summary: UploadImage
       tags:
       - files
+  /order/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/order.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all orders
+      tags:
+      - order
+  /order/make:
+    post:
+      description: Создает заказ исходя из корзины покупателя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Make order
+      tags:
+      - order
   /product/create:
     post:
       consumes:

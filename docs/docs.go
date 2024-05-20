@@ -98,7 +98,7 @@ const docTemplate = `{
                 "tags": [
                     "cart"
                 ],
-                "summary": "Create curt item",
+                "summary": "Create cart item",
                 "parameters": [
                     {
                         "description": "product id and count",
@@ -107,6 +107,45 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/cart.AddRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/change-count": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Изменяет кол-во товара в корзине на new_count",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cart"
+                ],
+                "summary": "Change count curt item",
+                "parameters": [
+                    {
+                        "description": "product id and count",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/cart.ChangeCountRequest"
                         }
                     }
                 ],
@@ -277,6 +316,55 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/image.UploadResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/get": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Get all orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/order.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/make": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Создает заказ исходя из корзины покупателя",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Make order",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -460,6 +548,17 @@ const docTemplate = `{
                 }
             }
         },
+        "cart.ChangeCountRequest": {
+            "type": "object",
+            "properties": {
+                "new_count": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "cart.GetResponse": {
             "type": "object",
             "properties": {
@@ -533,6 +632,23 @@ const docTemplate = `{
                 }
             }
         },
+        "order.GetResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.Order"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "product.CreateRequest": {
             "type": "object",
             "properties": {
@@ -599,6 +715,34 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "product": {
+                    "$ref": "#/definitions/storage.ProductInfo"
+                }
+            }
+        },
+        "storage.Order": {
+            "type": "object",
+            "properties": {
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.OrderItem"
+                    }
+                }
+            }
+        },
+        "storage.OrderItem": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "order_id": {
                     "type": "integer"
                 },
                 "product": {

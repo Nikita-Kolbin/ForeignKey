@@ -4,9 +4,11 @@ import (
 	"ForeignKey/internal/http-server/handlers/cart"
 	"ForeignKey/internal/http-server/handlers/customer"
 	img "ForeignKey/internal/http-server/handlers/image"
+	"ForeignKey/internal/http-server/handlers/order"
 	"ForeignKey/internal/http-server/handlers/product"
 	"ForeignKey/internal/http-server/handlers/website"
 	"ForeignKey/internal/image"
+	"github.com/go-chi/cors"
 	"log/slog"
 	"net/http"
 	"os"
@@ -68,8 +70,15 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
+	// CORS
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"*", "https://*", "http://*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	}))
+
 	// TODO: указать статусы для всех ответов
 	// TODO: поменять некоторык еррор логги на инфо
+	// TODO: поменять некоторые пост запросы на патч и делейт
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
@@ -87,7 +96,11 @@ func main() {
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
 
 	router.Post("/api/cart/add", cart.NewAdd(storage, log))
+	router.Post("/api/cart/change-count", cart.NewChangeCount(storage, log))
 	router.Get("/api/cart/get", cart.NewGet(storage, log))
+
+	router.Post("/api/order/make", order.NewMakeOrder(storage, log))
+	router.Get("/api/order/get", order.NewGet(storage, log))
 
 	// swagger
 	router.Get("/swagger/*", httpSwagger.Handler(

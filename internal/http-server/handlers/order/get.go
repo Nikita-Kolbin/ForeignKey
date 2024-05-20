@@ -1,4 +1,4 @@
-package cart
+package order
 
 import (
 	"ForeignKey/internal/http-server/jwt_token"
@@ -10,26 +10,25 @@ import (
 	"net/http"
 )
 
-type CartsGetter interface {
-	GetCartItems(cartId int) ([]storage.CartItem, error)
-	GetCartId(customerId int) (int, error)
+type OrdersGetter interface {
+	GetOrders(customerId int) ([]storage.Order, error)
 }
 
 type GetResponse struct {
 	response.Response
-	CartItems []storage.CartItem `json:"cart_items"`
+	Orders []storage.Order `json:"orders"`
 }
 
 // NewGet godoc
-// @Summary Get all cart items
+// @Summary Get all orders
 // @Security ApiKeyAuth
-// @Tags cart
-// @Produce  json
+// @Tags order
+// @Produce json
 // @Success 200 {object} GetResponse
-// @Router /cart/get [get]
-func NewGet(cg CartsGetter, log *slog.Logger) http.HandlerFunc {
+// @Router /order/get [get]
+func NewGet(og OrdersGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.cart.NewGet"
+		const op = "handlers.order.NewGet"
 
 		log = log.With(
 			slog.String("op", op),
@@ -41,7 +40,7 @@ func NewGet(cg CartsGetter, log *slog.Logger) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
 
-			render.JSON(w, r, responseError("invalid token format"))
+			render.JSON(w, r, responseGetError("invalid token format"))
 
 			return
 		}
@@ -50,50 +49,41 @@ func NewGet(cg CartsGetter, log *slog.Logger) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
 
-			render.JSON(w, r, responseError("invalid token"))
+			render.JSON(w, r, responseGetError("invalid token"))
 
 			return
 		}
 		if role != jwt_token.RoleCustomer {
 			log.Info("permission denied", slog.String("role", role))
 
-			render.JSON(w, r, responseError("only customers can by products"))
+			render.JSON(w, r, responseGetError("only customers can get order"))
 
 			return
 		}
 
-		cartId, err := cg.GetCartId(customerId)
+		orders, err := og.GetOrders(customerId)
 		if err != nil {
 			log.Error("failed to get cart", slog.String("err", err.Error()))
 
-			render.JSON(w, r, responseError("can't find cart"))
+			render.JSON(w, r, responseGetError("can't find cart"))
 
 			return
 		}
 
-		cartItems, err := cg.GetCartItems(cartId)
-		if err != nil {
-			log.Error("failed to get cart item", slog.String("err", err.Error()))
+		log.Info("orders given", slog.Int("customer id", customerId))
 
-			render.JSON(w, r, responseError("failed to get cart item"))
-
-			return
-		}
-
-		log.Info("cart items given", slog.Int("cart id", cartId))
-
-		render.JSON(w, r, responseOk(cartItems))
+		render.JSON(w, r, responseGetOk(orders))
 	}
 }
 
-func responseOk(ci []storage.CartItem) GetResponse {
+func responseGetOk(orders []storage.Order) GetResponse {
 	return GetResponse{
 		response.OK(),
-		ci,
+		orders,
 	}
 }
 
-func responseError(msg string) GetResponse {
+func responseGetError(msg string) GetResponse {
 	return GetResponse{
 		response.Error(msg),
 		nil,

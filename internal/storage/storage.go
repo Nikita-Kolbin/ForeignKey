@@ -22,3 +22,14 @@ type CartItem struct {
 	Product ProductInfo `json:"product"`
 	Count   int         `json:"count"`
 }
+
+type OrderItem struct {
+	Id      int         `json:"id"`
+	OrderId int         `json:"order_id"`
+	Product ProductInfo `json:"product"`
+	Count   int         `json:"count"`
+}
+
+type Order struct {
+	OrderItems []OrderItem `json:"order_items"`
+}

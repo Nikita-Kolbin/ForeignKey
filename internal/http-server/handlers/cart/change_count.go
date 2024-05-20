@@ -12,29 +12,29 @@ import (
 	"net/http"
 )
 
-type ItemsCreator interface {
+type ItemsCountChanger interface {
+	ChangeCartItemCount(cartId, productId, newCount int) error
 	GetCartId(customerId int) (int, error)
-	CreateCartItem(cartId, productId, count int) error
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 	GetProduct(productId int) (*storage.ProductInfo, error)
 }
 
-type AddRequest struct {
+type ChangeCountRequest struct {
 	ProductId int `json:"product_id"`
-	Count     int `json:"count"`
+	NewCount  int `json:"new_count"`
 }
 
-// NewAdd godoc
-// @Summary Create cart item
-// @Description Добавляет товар в корзину, если товар уже в корзине, увеличивает количество
+// NewChangeCount godoc
+// @Summary Change count curt item
+// @Description Изменяет кол-во товара в корзине на new_count
 // @Security ApiKeyAuth
 // @Tags cart
 // @Accept json
 // @Produce  json
-// @Param input body AddRequest true "product id and count"
+// @Param input body ChangeCountRequest true "product id and count"
 // @Success 200 {object} response.Response
-// @Router /cart/add [post]
-func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
+// @Router /cart/change-count [post]
+func NewChangeCount(icc ItemsCountChanger, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.cart.NewAdd"
 
@@ -43,7 +43,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		var req AddRequest
+		var req ChangeCountRequest
 
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
@@ -87,7 +87,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		customerWebsiteId, _, err := ic.GetWebsite(alias)
+		customerWebsiteId, _, err := icc.GetWebsite(alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
 
@@ -95,7 +95,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 
 			return
 		}
-		product, err := ic.GetProduct(req.ProductId)
+		product, err := icc.GetProduct(req.ProductId)
 		if err != nil {
 			log.Error("failed to get product", slog.String("err", err.Error()))
 
@@ -114,7 +114,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		cartId, err := ic.GetCartId(customerId)
+		cartId, err := icc.GetCartId(customerId)
 		if err != nil {
 			log.Error("failed to get cart", slog.String("err", err.Error()))
 
@@ -123,7 +123,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = ic.CreateCartItem(cartId, req.ProductId, req.Count)
+		err = icc.ChangeCartItemCount(cartId, req.ProductId, req.NewCount)
 		if err != nil {
 			log.Error("failed to create cart item", slog.String("err", err.Error()))
 
@@ -132,7 +132,7 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("cart item created", slog.Int("cart id", cartId))
+		log.Info("cart item count changed", slog.Int("cart id", cartId))
 
 		render.JSON(w, r, response.OK())
 	}
