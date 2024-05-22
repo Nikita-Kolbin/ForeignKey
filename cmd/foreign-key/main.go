@@ -48,6 +48,7 @@ func main() {
 	log.Info("starting service", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
+	// TODO: прописать создание папок
 	// storage
 	storage, err := sqlite.New(cfg.StoragePath)
 	if err != nil {
@@ -74,6 +75,7 @@ func main() {
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*", "https://*", "http://*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
 	}))
 
 	// TODO: указать статусы для всех ответов
