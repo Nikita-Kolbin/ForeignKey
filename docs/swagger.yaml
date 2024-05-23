@@ -265,7 +265,7 @@ paths:
       tags:
       - cart
   /cart/change-count:
-    post:
+    patch:
       consumes:
       - application/json
       description: Изменяет кол-во товара в корзине на new_count
@@ -499,6 +499,27 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create website
+      tags:
+      - website
+  /website/delete/{alias}:
+    delete:
+      description: Удаляет сайт по алиасу
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website
       tags:
       - website
 securityDefinitions:

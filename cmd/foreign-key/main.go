@@ -90,6 +90,7 @@ func main() {
 
 	router.Post("/api/website/create", website.NewCreate(storage, log))
 	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
+	router.Delete("/api/website/delete/{alias}", website.NewDelete(storage, log))
 
 	router.Post("/api/product/create", product.NewCreate(storage, log))
 	router.Get("/api/product/get-by-alias/{alias}", product.NewGetByAlias(storage, log))
@@ -98,7 +99,7 @@ func main() {
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
 
 	router.Post("/api/cart/add", cart.NewAdd(storage, log))
-	router.Post("/api/cart/change-count", cart.NewChangeCount(storage, log))
+	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))
 	router.Get("/api/cart/get", cart.NewGet(storage, log))
 
 	router.Post("/api/order/make", order.NewMakeOrder(storage, log))

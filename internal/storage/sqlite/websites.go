@@ -79,3 +79,16 @@ func (s *Storage) GetWebsite(alias string) (websiteId, adminId int, err error) {
 
 	return websiteId, adminId, nil
 }
+
+func (s *Storage) DeleteWebsite(alias string) error {
+	const op = "storage.sqlite.DeleteWebsite"
+
+	q := `DELETE FROM websites WHERE alias=?`
+
+	_, err := s.db.Exec(q, alias)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}

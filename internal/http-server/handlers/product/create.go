@@ -100,7 +100,7 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 		}
 
 		if adminId != id {
-			log.Info("admin is not owner", slog.String("err", err.Error()))
+			log.Info("admin is not owner", slog.String("alias", req.Alias))
 
 			render.JSON(w, r, response.Error("admin is not owner"))
 

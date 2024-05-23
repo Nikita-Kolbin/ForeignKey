@@ -121,7 +121,7 @@ const docTemplate = `{
             }
         },
         "/cart/change-count": {
-            "post": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -487,6 +487,40 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/website.CreateRequest"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/website/delete/{alias}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Удаляет сайт по алиасу",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "website"
+                ],
+                "summary": "Delete website",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {

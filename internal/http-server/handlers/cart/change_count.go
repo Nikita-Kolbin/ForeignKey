@@ -33,7 +33,7 @@ type ChangeCountRequest struct {
 // @Produce  json
 // @Param input body ChangeCountRequest true "product id and count"
 // @Success 200 {object} response.Response
-// @Router /cart/change-count [post]
+// @Router /cart/change-count [patch]
 func NewChangeCount(icc ItemsCountChanger, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.cart.NewAdd"
