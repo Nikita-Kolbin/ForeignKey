@@ -5,13 +5,14 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"github.com/mattn/go-sqlite3"
+	"net/mail"
 )
 
 func (s *Storage) initAdmins() error {
 	q := `
 	CREATE TABLE IF NOT EXISTS admins (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		login TEXT UNIQUE,
+		email TEXT UNIQUE,
 		password_hash TEXT
 	);
 	`
@@ -24,14 +25,18 @@ func (s *Storage) initAdmins() error {
 	return nil
 }
 
-func (s *Storage) CreateAdmin(login, password string) error {
+func (s *Storage) CreateAdmin(email, password string) error {
 	const op = "storage.sqlite.CreateAdmin"
 
-	q := `INSERT INTO admins (login, password_hash) VALUES (?, ?)`
+	q := `INSERT INTO admins (email, password_hash) VALUES (?, ?)`
+
+	if !validEmail(email) {
+		return storage.ErrInvalidEmail
+	}
 
 	hash := generatePasswordHash(password)
 
-	_, err := s.db.Exec(q, login, hash)
+	_, err := s.db.Exec(q, email, hash)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", op, storage.ErrLoginTaken)
@@ -43,12 +48,12 @@ func (s *Storage) CreateAdmin(login, password string) error {
 	return nil
 }
 
-func (s *Storage) GetAdminId(login, password string) (int, error) {
+func (s *Storage) GetAdminId(email, password string) (int, error) {
 	const op = "storage.sqlite.GetAdminId"
 
-	q := `SELECT id FROM admins WHERE login=? AND password_hash=?`
+	q := `SELECT id FROM admins WHERE email=? AND password_hash=?`
 
-	row := s.db.QueryRow(q, login, generatePasswordHash(password))
+	row := s.db.QueryRow(q, email, generatePasswordHash(password))
 
 	var id int
 	if err := row.Scan(&id); err != nil {
@@ -63,4 +68,9 @@ func generatePasswordHash(p string) string {
 	hash.Write([]byte(p))
 
 	return fmt.Sprintf("%x", hash.Sum(nil))
+}
+
+func validEmail(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }

@@ -18,7 +18,7 @@ type CustomersGetter interface {
 
 type SignInRequest struct {
 	Alias    string `json:"alias"`
-	Login    string `json:"login"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -71,11 +71,11 @@ func NewSignIn(cg CustomersGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := cg.GetCustomerId(websiteId, req.Login, req.Password)
+		id, err := cg.GetCustomerId(websiteId, req.Email, req.Password)
 		if err != nil {
 			log.Error("failed to get customer", slog.String("err", err.Error()))
 
-			render.JSON(w, r, response.Error("wrong login or password"))
+			render.JSON(w, r, response.Error("wrong email or password"))
 
 			return
 		}
@@ -89,7 +89,7 @@ func NewSignIn(cg CustomersGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("customer sing in", slog.String("login", req.Login))
+		log.Info("customer sing in", slog.String("email", req.Email))
 
 		render.JSON(w, r, responseOK(t))
 	}

@@ -538,7 +538,7 @@ const docTemplate = `{
         "admin.SignInRequest": {
             "type": "object",
             "properties": {
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -563,7 +563,7 @@ const docTemplate = `{
         "admin.SignUpRequest": {
             "type": "object",
             "properties": {
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -616,7 +616,7 @@ const docTemplate = `{
                 "alias": {
                     "type": "string"
                 },
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -644,7 +644,7 @@ const docTemplate = `{
                 "alias": {
                     "type": "string"
                 },
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -759,6 +759,9 @@ const docTemplate = `{
         "storage.Order": {
             "type": "object",
             "properties": {
+                "date_time": {
+                    "type": "string"
+                },
                 "order_items": {
                     "type": "array",
                     "items": {

@@ -3,9 +3,16 @@ package storage
 import "errors"
 
 var (
-	ErrLoginTaken = errors.New("login is already taken")
-	ErrAliasTaken = errors.New("alias is already taken")
+	ErrLoginTaken   = errors.New("login is already taken")
+	ErrAliasTaken   = errors.New("alias is already taken")
+	ErrEmptyOrder   = errors.New("order is empty")
+	ErrInvalidEmail = errors.New("email is invalid")
 )
+
+type Customer struct {
+	WebsiteId int    `json:"website_id"`
+	Email     string `json:"email"`
+}
 
 type ProductInfo struct {
 	Id          int    `json:"id"`
@@ -31,5 +38,6 @@ type OrderItem struct {
 }
 
 type Order struct {
+	DateTime   string      `json:"date_time"`
 	OrderItems []OrderItem `json:"order_items"`
 }

@@ -12,7 +12,7 @@ func (s *Storage) initCustomers() error {
 	CREATE TABLE IF NOT EXISTS customers (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		website_id INTEGER,
-		login TEXT,
+		email TEXT,
 		password_hash TEXT,
 	    FOREIGN KEY (website_id) REFERENCES website (id)
 	);
@@ -26,17 +26,21 @@ func (s *Storage) initCustomers() error {
 	return nil
 }
 
-func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
+func (s *Storage) CreateCustomers(websiteId int, email, password string) error {
 	const op = "storage.sqlite.CreateCustomers"
 
-	q := `INSERT INTO customers (website_id, login, password_hash) VALUES (?, ?, ?);`
+	q := `INSERT INTO customers (website_id, email, password_hash) VALUES (?, ?, ?);`
+
+	if !validEmail(email) {
+		return storage.ErrInvalidEmail
+	}
 
 	tx, err := s.db.Begin()
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	e, err := s.CustomerIsExists(websiteId, login)
+	e, err := s.CustomerIsExists(websiteId, email)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -46,7 +50,7 @@ func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
 
 	hash := generatePasswordHash(password)
 
-	res, err := tx.Exec(q, websiteId, login, hash)
+	res, err := tx.Exec(q, websiteId, email, hash)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -69,12 +73,12 @@ func (s *Storage) CreateCustomers(websiteId int, login, password string) error {
 	return nil
 }
 
-func (s *Storage) GetCustomerId(websiteId int, login, password string) (int, error) {
+func (s *Storage) GetCustomerId(websiteId int, email, password string) (int, error) {
 	const op = "storage.sqlite.GetCustomerId"
 
-	q := `SELECT id FROM customers WHERE website_id=? AND login=? AND password_hash=?`
+	q := `SELECT id FROM customers WHERE website_id=? AND email=? AND password_hash=?`
 
-	row := s.db.QueryRow(q, websiteId, login, generatePasswordHash(password))
+	row := s.db.QueryRow(q, websiteId, email, generatePasswordHash(password))
 
 	var id int
 	if err := row.Scan(&id); err != nil {
@@ -84,12 +88,28 @@ func (s *Storage) GetCustomerId(websiteId int, login, password string) (int, err
 	return id, nil
 }
 
-func (s *Storage) CustomerIsExists(websiteId int, login string) (bool, error) {
+func (s *Storage) GetCustomer(id int) (*storage.Customer, error) {
+	const op = "storage.sqlite.GetCustomer"
+
+	q := `SELECT website_id, email FROM customers WHERE id=?`
+
+	row := s.db.QueryRow(q, id)
+
+	var websiteId int
+	var email string
+	if err := row.Scan(&websiteId, &email); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &storage.Customer{WebsiteId: websiteId, Email: email}, nil
+}
+
+func (s *Storage) CustomerIsExists(websiteId int, email string) (bool, error) {
 	const op = "storage.sqlite.CustomerIsExists"
 
-	q := `SELECT COUNT(*) FROM customers WHERE website_id=? AND login=?`
+	q := `SELECT COUNT(*) FROM customers WHERE website_id=? AND email=?`
 
-	row := s.db.QueryRow(q, websiteId, login)
+	row := s.db.QueryRow(q, websiteId, email)
 
 	var cnt int
 	if err := row.Scan(&cnt); err != nil {

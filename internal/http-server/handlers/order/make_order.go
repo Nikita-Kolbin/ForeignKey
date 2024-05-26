@@ -3,6 +3,8 @@ package order
 import (
 	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/storage"
+	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"log/slog"
@@ -11,6 +13,11 @@ import (
 
 type OrdersMaker interface {
 	CreateOrder(customerId int) error
+	GetCustomer(id int) (*storage.Customer, error)
+}
+
+type EmailSender interface {
+	Send(receiverEmail, msg string) error
 }
 
 // NewMakeOrder godoc
@@ -21,7 +28,7 @@ type OrdersMaker interface {
 // @Produce json
 // @Success 200 {object} response.Response
 // @Router /order/make [post]
-func NewMakeOrder(om OrdersMaker, log *slog.Logger) http.HandlerFunc {
+func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.cart.NewMakeOrder"
 
@@ -57,6 +64,13 @@ func NewMakeOrder(om OrdersMaker, log *slog.Logger) http.HandlerFunc {
 		}
 
 		err = om.CreateOrder(customerId)
+		if errors.Is(err, storage.ErrEmptyOrder) {
+			log.Error("failed to make order", slog.String("err", err.Error()))
+
+			render.JSON(w, r, response.Error("order is empty"))
+
+			return
+		}
 		if err != nil {
 			log.Error("failed to make order", slog.String("err", err.Error()))
 
@@ -68,5 +82,17 @@ func NewMakeOrder(om OrdersMaker, log *slog.Logger) http.HandlerFunc {
 		log.Info("order made", slog.Int("customer id", customerId))
 
 		render.JSON(w, r, response.OK())
+
+		customer, err := om.GetCustomer(customerId)
+		if err != nil {
+			log.Error("can't get customer", slog.String("err", err.Error()))
+			return
+		}
+
+		err = es.Send(customer.Email, "Заказ оформлен")
+		if err != nil {
+			log.Error("can't send message", slog.String("err", err.Error()))
+			return
+		}
 	}
 }

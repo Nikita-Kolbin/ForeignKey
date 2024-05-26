@@ -18,7 +18,7 @@ type CustomersCreator interface {
 
 type SignUpRequest struct {
 	Alias    string `json:"alias"`
-	Login    string `json:"login"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -66,11 +66,18 @@ func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = cc.CreateCustomers(websiteId, req.Login, req.Password)
-		if errors.Is(err, storage.ErrLoginTaken) {
-			log.Error("login is already taken", slog.String("login", req.Login))
+		err = cc.CreateCustomers(websiteId, req.Email, req.Password)
+		if errors.Is(err, storage.ErrInvalidEmail) {
+			log.Error("email is invalid", slog.String("email", req.Email))
 
-			render.JSON(w, r, response.Error("login is already taken"))
+			render.JSON(w, r, response.Error("email is invalid"))
+
+			return
+		}
+		if errors.Is(err, storage.ErrLoginTaken) {
+			log.Error("email is already taken", slog.String("email", req.Email))
+
+			render.JSON(w, r, response.Error("email is already taken"))
 
 			return
 		}
@@ -82,7 +89,7 @@ func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("customer created", slog.String("login", req.Login))
+		log.Info("customer created", slog.String("email", req.Email))
 
 		render.JSON(w, r, response.OK())
 	}

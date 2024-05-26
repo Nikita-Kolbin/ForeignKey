@@ -5,3 +5,8 @@ http_server:
   address: "0.0.0.0:8082"
   timeout: 4s
   idle_timeout: 60s
+email:
+  email_address: "foreignkey@bk.ru"
+  password: "zHjSjnGzQWEmSJBnfWGg"
+  smtp_host: "smtp.mail.ru"
+  smtp_port: "25"

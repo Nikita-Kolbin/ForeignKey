@@ -2,7 +2,7 @@ basePath: /api
 definitions:
   admin.SignInRequest:
     properties:
-      login:
+      email:
         type: string
       password:
         type: string
@@ -18,7 +18,7 @@ definitions:
     type: object
   admin.SignUpRequest:
     properties:
-      login:
+      email:
         type: string
       password:
         type: string
@@ -52,7 +52,7 @@ definitions:
     properties:
       alias:
         type: string
-      login:
+      email:
         type: string
       password:
         type: string
@@ -70,7 +70,7 @@ definitions:
     properties:
       alias:
         type: string
-      login:
+      email:
         type: string
       password:
         type: string
@@ -144,6 +144,8 @@ definitions:
     type: object
   storage.Order:
     properties:
+      date_time:
+        type: string
       order_items:
         items:
           $ref: '#/definitions/storage.OrderItem'

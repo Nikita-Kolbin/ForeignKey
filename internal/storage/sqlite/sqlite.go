@@ -65,5 +65,21 @@ func (s *Storage) initTables() error {
 		return fmt.Errorf("can't init order_items: %w", err)
 	}
 
+	if err := s.initAboutUsStyles(); err != nil {
+		return fmt.Errorf("can't init about_us_styles: %w", err)
+	}
+
+	if err := s.initFooterStyles(); err != nil {
+		return fmt.Errorf("can't init footer_styles: %w", err)
+	}
+
+	if err := s.initHeaderStyles(); err != nil {
+		return fmt.Errorf("can't init header_styles: %w", err)
+	}
+
+	if err := s.initProductsStyles(); err != nil {
+		return fmt.Errorf("can't init products_styles: %w", err)
+	}
+
 	return nil
 }

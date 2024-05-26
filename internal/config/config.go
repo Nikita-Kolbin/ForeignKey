@@ -12,12 +12,20 @@ type Config struct {
 	StoragePath string `yaml:"storage_path" env-required:"true"`
 	ImagesPath  string `yaml:"images_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
+	Email       `yaml:"email"`
 }
 
 type HTTPServer struct {
 	Address     string        `yaml:"address" env-default:"localhost:8082"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"10s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
+}
+
+type Email struct {
+	EmailAddress string `yaml:"email_address"`
+	Password     string `yaml:"password"`
+	SmtpHost     string `yaml:"smtp_host"`
+	SmtpPort     string `yaml:"smtp_port"`
 }
 
 func MustLoad() *Config {

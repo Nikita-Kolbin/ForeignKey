@@ -11,6 +11,7 @@ func (s *Storage) initOrders() error {
 	CREATE TABLE IF NOT EXISTS orders (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		customer_id INTEGER,
+		date_time TEXT,
 	    FOREIGN KEY (customer_id) REFERENCES customers (id)
 	);
 	`
@@ -26,7 +27,7 @@ func (s *Storage) initOrders() error {
 func (s *Storage) CreateOrder(customerId int) error {
 	const op = "storage.sqlite.CreateOrder"
 
-	q := `INSERT INTO orders (customer_id) VALUES (?)`
+	q := `INSERT INTO orders (customer_id, date_time) VALUES (?, datetime('now'))`
 
 	tx, err := s.db.Begin()
 	if err != nil {
@@ -55,6 +56,10 @@ func (s *Storage) CreateOrder(customerId int) error {
 		return errWithRollback(tx, op, err)
 	}
 
+	if len(cartItems) == 0 {
+		return errWithRollback(tx, op, storage.ErrEmptyOrder)
+	}
+
 	for _, item := range cartItems {
 		err = s.CreateOrderItem(tx, orderId, item.Product.Id, item.Count)
 		if err != nil {
@@ -77,7 +82,7 @@ func (s *Storage) CreateOrder(customerId int) error {
 func (s *Storage) GetOrders(customerId int) ([]storage.Order, error) {
 	const op = "storage.sqlite.GetOrdersId"
 
-	q := `SELECT id FROM orders WHERE customer_id=?`
+	q := `SELECT id, date_time FROM orders WHERE customer_id=?`
 
 	rows, err := s.db.Query(q, customerId)
 	if err != nil {
@@ -85,25 +90,29 @@ func (s *Storage) GetOrders(customerId int) ([]storage.Order, error) {
 	}
 
 	ordersId := make([]int, 0)
+	dateTimes := make([]string, 0)
 
 	var id int
+	var dateTime string
 
 	for rows.Next() {
-		if err = rows.Scan(&id); err != nil {
+		if err = rows.Scan(&id, &dateTime); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		ordersId = append(ordersId, id)
+		dateTimes = append(dateTimes, dateTime)
 	}
 
 	res := make([]storage.Order, 0)
 
-	for _, orderId := range ordersId {
+	for i, orderId := range ordersId {
 		orderItems, err := s.GetOrderItems(orderId)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
 		o := storage.Order{
+			DateTime:   dateTimes[i],
 			OrderItems: orderItems,
 		}
 

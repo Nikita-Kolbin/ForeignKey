@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ForeignKey/internal/email"
 	"ForeignKey/internal/http-server/handlers/cart"
 	"ForeignKey/internal/http-server/handlers/customer"
 	img "ForeignKey/internal/http-server/handlers/image"
@@ -56,6 +57,7 @@ func main() {
 		os.Exit(0)
 	}
 
+	// TODO: прописать создание папок
 	// image saver
 	imageSaver, err := image.New(cfg.ImagesPath)
 	if err != nil {
@@ -63,6 +65,12 @@ func main() {
 		os.Exit(0)
 	}
 
+	// TODO: вынести пароль в переменную окружения
+	// email
+	emailSender := email.New(cfg.EmailAddress, cfg.Password, cfg.SmtpHost, cfg.SmtpPort)
+	_ = emailSender
+
+	// TODO: Вынести настройку роутера в отдельный пакет
 	router := chi.NewRouter()
 
 	// middleware
@@ -81,6 +89,7 @@ func main() {
 	// TODO: указать статусы для всех ответов
 	// TODO: поменять некоторык еррор логги на инфо
 	// TODO: поменять некоторые пост запросы на патч и делейт
+	// TODO: вход по вк
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
@@ -102,7 +111,9 @@ func main() {
 	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))
 	router.Get("/api/cart/get", cart.NewGet(storage, log))
 
-	router.Post("/api/order/make", order.NewMakeOrder(storage, log))
+	// TODO: добавить сохранение цены товара на момент заказа
+	// TODO: добавить статус заказа, уведа на почту
+	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
 	router.Get("/api/order/get", order.NewGet(storage, log))
 
 	// swagger
@@ -121,7 +132,7 @@ func main() {
 
 	log.Info("starting server", slog.String("addr", cfg.Address))
 	if err = srv.ListenAndServe(); err != nil {
-		log.Error("failed to start server")
+		log.Error("failed to start server:", slog.String("err", err.Error()))
 	}
 
 	log.Error("server stopped")

@@ -531,7 +531,7 @@
         "admin.SignInRequest": {
             "type": "object",
             "properties": {
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -556,7 +556,7 @@
         "admin.SignUpRequest": {
             "type": "object",
             "properties": {
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -609,7 +609,7 @@
                 "alias": {
                     "type": "string"
                 },
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -637,7 +637,7 @@
                 "alias": {
                     "type": "string"
                 },
-                "login": {
+                "email": {
                     "type": "string"
                 },
                 "password": {
@@ -752,6 +752,9 @@
         "storage.Order": {
             "type": "object",
             "properties": {
+                "date_time": {
+                    "type": "string"
+                },
                 "order_items": {
                     "type": "array",
                     "items": {

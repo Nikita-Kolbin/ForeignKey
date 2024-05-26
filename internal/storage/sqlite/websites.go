@@ -6,8 +6,6 @@ import (
 	"github.com/mattn/go-sqlite3"
 )
 
-// TODO: сделать ограниченяе на один сайт для админа
-
 func (s *Storage) initWebsites() error {
 	q := `
 	CREATE TABLE IF NOT EXISTS websites (
