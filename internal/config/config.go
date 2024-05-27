@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Env         string `yaml:"env" env-required:"true"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
+	StorageName string `yaml:"storage_name" env-required:"true"`
 	ImagesPath  string `yaml:"images_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
 	Email       `yaml:"email"`

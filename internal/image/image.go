@@ -17,6 +17,10 @@ func New(imagesPath string) (*Image, error) {
 	const op = "storage.images.New"
 
 	if _, err := os.Stat(imagesPath); os.IsNotExist(err) {
+		_ = os.MkdirAll(imagesPath, os.ModePerm)
+	}
+
+	if _, err := os.Stat(imagesPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("%s: images dir does not exist: %w", op, err)
 	}
 

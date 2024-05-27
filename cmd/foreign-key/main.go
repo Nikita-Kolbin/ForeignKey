@@ -2,27 +2,17 @@ package main
 
 import (
 	"ForeignKey/internal/email"
-	"ForeignKey/internal/http-server/handlers/cart"
-	"ForeignKey/internal/http-server/handlers/customer"
-	img "ForeignKey/internal/http-server/handlers/image"
-	"ForeignKey/internal/http-server/handlers/order"
-	"ForeignKey/internal/http-server/handlers/product"
-	"ForeignKey/internal/http-server/handlers/website"
 	"ForeignKey/internal/image"
-	"github.com/go-chi/cors"
+	"ForeignKey/internal/router"
 	"log/slog"
 	"net/http"
 	"os"
 
 	_ "ForeignKey/docs"
 	"ForeignKey/internal/config"
-	"ForeignKey/internal/http-server/handlers/admin"
-	mwLogger "ForeignKey/internal/http-server/middleware/logger"
 	"ForeignKey/internal/logger"
 	"ForeignKey/internal/storage/sqlite"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 	l "log"
 )
@@ -51,7 +41,7 @@ func main() {
 
 	// TODO: прописать создание папок
 	// storage
-	storage, err := sqlite.New(cfg.StoragePath)
+	storage, err := sqlite.New(cfg.StoragePath, cfg.StorageName)
 	if err != nil {
 		log.Error("failed to initialize storage", slog.String("error", err.Error()))
 		os.Exit(0)
@@ -70,61 +60,18 @@ func main() {
 	emailSender := email.New(cfg.EmailAddress, cfg.Password, cfg.SmtpHost, cfg.SmtpPort)
 	_ = emailSender
 
-	// TODO: Вынести настройку роутера в отдельный пакет
-	router := chi.NewRouter()
-
-	// middleware
-	router.Use(middleware.RequestID)
-	router.Use(mwLogger.New(log))
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.URLFormat)
-
-	// CORS
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"*", "https://*", "http://*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
-	}))
-
-	// TODO: указать статусы для всех ответов
-	// TODO: поменять некоторык еррор логги на инфо
-	// TODO: поменять некоторые пост запросы на патч и делейт
-	// TODO: вход по вк
-	// handlers
-	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
-	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
-
-	router.Post("/api/image/upload", img.NewUpload(imageSaver, storage, log))
-	router.Get("/api/image/download/{id}", img.NewDownload(imageSaver, storage, log))
-
-	router.Post("/api/website/create", website.NewCreate(storage, log))
-	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
-	router.Delete("/api/website/delete/{alias}", website.NewDelete(storage, log))
-
-	router.Post("/api/product/create", product.NewCreate(storage, log))
-	router.Get("/api/product/get-by-alias/{alias}", product.NewGetByAlias(storage, log))
-
-	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
-	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
-
-	router.Post("/api/cart/add", cart.NewAdd(storage, log))
-	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))
-	router.Get("/api/cart/get", cart.NewGet(storage, log))
-
-	// TODO: добавить сохранение цены товара на момент заказа
-	// TODO: добавить статус заказа, уведа на почту
-	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
-	router.Get("/api/order/get", order.NewGet(storage, log))
+	// http router
+	r := router.New(storage, imageSaver, emailSender, log)
 
 	// swagger
-	router.Get("/swagger/*", httpSwagger.Handler(
+	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL(cfg.Address+"/swagger/doc.json"),
 	))
 
 	// server
 	srv := &http.Server{
 		Addr:         cfg.Address,
-		Handler:      router,
+		Handler:      r,
 		ReadTimeout:  cfg.Timeout,
 		WriteTimeout: cfg.Timeout,
 		IdleTimeout:  cfg.IdleTimeout,
