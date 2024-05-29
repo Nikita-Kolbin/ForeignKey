@@ -1,6 +1,5 @@
 .idea
 storage.db
-go.sum
 testdir
 hello
 images
