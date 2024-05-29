@@ -46,6 +46,7 @@ func NewUpload(imagesSever ImagesSaver, imagesCreator ImagesCreator, log *slog.L
 		b, err := io.ReadAll(r.Body)
 		if err != nil {
 			log.Error("failed to read request body", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, responseErr("failed to read request"))
 			return
 		}
@@ -53,6 +54,7 @@ func NewUpload(imagesSever ImagesSaver, imagesCreator ImagesCreator, log *slog.L
 		ext, err := parseExtension(r)
 		if err != nil {
 			log.Error("failed to read request body", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, responseErr("can't parse file extension"))
 			return
 		}
@@ -60,6 +62,7 @@ func NewUpload(imagesSever ImagesSaver, imagesCreator ImagesCreator, log *slog.L
 		path, err := imagesSever.Save(b, ext)
 		if err != nil {
 			log.Error("failed to save image", slog.String("err", err.Error()))
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, responseErr("failed to save image"))
 			return
 		}
@@ -67,6 +70,7 @@ func NewUpload(imagesSever ImagesSaver, imagesCreator ImagesCreator, log *slog.L
 		id, err := imagesCreator.CreateImage(path)
 		if err != nil {
 			log.Error("failed to create image", slog.String("err", err.Error()))
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, responseErr("failed to save image"))
 			return
 		}

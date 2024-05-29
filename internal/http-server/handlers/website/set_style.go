@@ -3,37 +3,58 @@ package website
 import (
 	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
-	"github.com/go-chi/chi/v5"
+	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"io"
 	"log/slog"
 	"net/http"
 )
 
-type WebsitesDeleter interface {
+type StyleChanger interface {
+	UpdateStyle(alias, backgroundColor, font string) error
 	GetWebsite(alias string) (websiteId, adminId int, err error)
-	DeleteWebsite(alias string) error
 }
 
-// NewDelete godoc
-// @Summary Delete website
+type StyleRequest struct {
+	Alias           string `json:"alias"`
+	BackgroundColor string `json:"background_color"`
+	Font            string `json:"font"`
+}
+
+// NewSetStyle godoc
+// @Summary Change style
 // @Security ApiKeyAuth
-// @Description Удаляет сайт по алиасу
 // @Tags website
+// @Accept json
 // @Produce  json
-// @Param alias path string true "website alias"
+// @Param input body StyleRequest true "style to website"
 // @Success 200 {object} response.Response
-// @Router /website/delete/{alias} [delete]
-func NewDelete(wd WebsitesDeleter, log *slog.Logger) http.HandlerFunc {
+// @Router /website/set-style [patch]
+func NewSetStyle(sc StyleChanger, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.website.NewDelete"
+		const op = "handlers.website.NewSetStyle"
 
 		log = log.With(
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		alias := chi.URLParam(r, "alias")
+		var req StyleRequest
+
+		err := render.DecodeJSON(r.Body, &req)
+		if errors.Is(err, io.EOF) {
+			log.Error("request body is empty")
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("empty request"))
+			return
+		}
+		if err != nil {
+			log.Error("failed to decode request body", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("failed to decode request"))
+			return
+		}
 
 		auth := r.Header.Get("Authorization")
 		token, err := jwt_token.GetTokenFromRequest(auth)
@@ -58,7 +79,7 @@ func NewDelete(wd WebsitesDeleter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		_, adminId, err := wd.GetWebsite(alias)
+		_, adminId, err := sc.GetWebsite(req.Alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)
@@ -66,21 +87,21 @@ func NewDelete(wd WebsitesDeleter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 		if adminId != id {
-			log.Info("admin is not owner", slog.String("alias", alias))
+			log.Info("admin is not owner", slog.String("alias", req.Alias))
 			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("admin is not owner"))
 			return
 		}
 
-		err = wd.DeleteWebsite(alias)
+		err = sc.UpdateStyle(req.Alias, req.BackgroundColor, req.Font)
 		if err != nil {
-			log.Error("failed to delete website", slog.String("err", err.Error()))
+			log.Error("failed to change style", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, response.Error("failed to delete website"))
+			render.JSON(w, r, response.Error("failed to change style"))
 			return
 		}
 
-		log.Info("website deleted", slog.String("alias", alias))
+		log.Info("style changed", slog.String("alias", req.Alias))
 
 		render.JSON(w, r, response.OK())
 	}

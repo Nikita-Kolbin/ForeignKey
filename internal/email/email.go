@@ -12,6 +12,8 @@ type Email struct {
 	smtpPort string
 }
 
+// TODO: вынести пароль в переменную окружения
+
 func New(email, password, smtpHost, smtpPort string) *Email {
 	return &Email{
 		email:    email,

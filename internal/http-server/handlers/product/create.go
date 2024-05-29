@@ -51,16 +51,14 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("empty request"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to decode request"))
-
 			return
 		}
 
@@ -68,42 +66,37 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 		token, err := jwt_token.GetTokenFromRequest(auth)
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token format"))
-
 			return
 		}
 
 		id, role, _, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token"))
-
 			return
 		}
 		if role != jwt_token.RoleAdmin {
 			log.Info("permission denied", slog.String("role", role))
-
+			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("permission denied"))
-
 			return
 		}
 
 		websiteId, adminId, err := pc.GetWebsite(req.Alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to find website"))
-
 			return
 		}
 
 		if adminId != id {
 			log.Info("admin is not owner", slog.String("alias", req.Alias))
-
+			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("admin is not owner"))
-
 			return
 		}
 
@@ -111,9 +104,8 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 		err = pc.CreateProduct(pi.Name, pi.Description, websiteId, pi.Price, pi.ImageId)
 		if err != nil {
 			log.Error("failed to create product", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to create product"))
-
 			return
 		}
 

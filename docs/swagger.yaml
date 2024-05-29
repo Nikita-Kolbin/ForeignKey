@@ -193,6 +193,26 @@ definitions:
       alias:
         type: string
     type: object
+  website.GetStyleResponse:
+    properties:
+      background_color:
+        type: string
+      error:
+        type: string
+      font:
+        type: string
+      status:
+        type: string
+    type: object
+  website.StyleRequest:
+    properties:
+      alias:
+        type: string
+      background_color:
+        type: string
+      font:
+        type: string
+    type: object
 host: localhost:8082
 info:
   contact: {}
@@ -522,6 +542,47 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete website
+      tags:
+      - website
+  /website/get-style/{alias}:
+    get:
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/website.GetStyleResponse'
+      summary: Get website style
+      tags:
+      - website
+  /website/set-style:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: style to website
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/website.StyleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change style
       tags:
       - website
 securityDefinitions:

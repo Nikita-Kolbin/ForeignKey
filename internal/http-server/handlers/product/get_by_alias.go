@@ -42,18 +42,16 @@ func NewGetByAlias(pg ProductsGetter, log *slog.Logger) http.HandlerFunc {
 		websiteId, _, err := pg.GetWebsite(alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, responseError("failed to find website"))
-
 			return
 		}
 
 		products, err := pg.GetProducts(websiteId)
 		if err != nil {
 			log.Error("failed to get products", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, responseError("failed to get products"))
-
 			return
 		}
 

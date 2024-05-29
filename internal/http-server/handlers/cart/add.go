@@ -48,16 +48,14 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("empty request"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to decode request"))
-
 			return
 		}
 
@@ -65,70 +63,62 @@ func NewAdd(ic ItemsCreator, log *slog.Logger) http.HandlerFunc {
 		token, err := jwt_token.GetTokenFromRequest(auth)
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token format"))
-
 			return
 		}
 
 		customerId, role, alias, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token"))
-
 			return
 		}
 		if role != jwt_token.RoleCustomer {
 			log.Info("permission denied", slog.String("role", role))
-
+			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("only customers can by products"))
-
 			return
 		}
 
 		customerWebsiteId, _, err := ic.GetWebsite(alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("can't find website"))
-
 			return
 		}
 		product, err := ic.GetProduct(req.ProductId)
 		if err != nil {
 			log.Error("failed to get product", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("can't find product"))
-
 			return
 		}
 		if customerWebsiteId != product.WebsiteId {
-			log.Info("wrong website", slog.Int(
-				"customer", customerWebsiteId),
+			log.Info("wrong website",
+				slog.Int("customer", customerWebsiteId),
 				slog.Int("product", product.WebsiteId),
 			)
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("websites id is not equal"))
-
 			return
 		}
 
 		cartId, err := ic.GetCartId(customerId)
 		if err != nil {
 			log.Error("failed to get cart", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("can't find cart"))
-
 			return
 		}
 
 		err = ic.CreateCartItem(cartId, req.ProductId, req.Count)
 		if err != nil {
 			log.Error("failed to create cart item", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to create cart item"))
-
 			return
 		}
 

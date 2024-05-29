@@ -12,6 +12,8 @@ func (s *Storage) initWebsites() error {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		admin_id INTEGER,
 		alias TEXT UNIQUE,
+		background_color TEXT,
+		font TEXT,
 	    FOREIGN KEY (admin_id) REFERENCES admins (id)
 	);
 	`
@@ -27,9 +29,9 @@ func (s *Storage) initWebsites() error {
 func (s *Storage) CreateWebsite(alias string, adminId int) error {
 	const op = "storage.sqlite.CreateWebsite"
 
-	q := `INSERT INTO websites (alias, admin_id) VALUES (?, ?)`
+	q := `INSERT INTO websites (alias, admin_id, background_color, font) VALUES (?, ?, ?, ?)`
 
-	_, err := s.db.Exec(q, alias, adminId)
+	_, err := s.db.Exec(q, alias, adminId, storage.DefaultBackgroundColor, storage.DefaultFont)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", op, storage.ErrAliasTaken)
@@ -89,4 +91,32 @@ func (s *Storage) DeleteWebsite(alias string) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) UpdateStyle(alias, backgroundColor, font string) error {
+	const op = "storage.sqlite.UpdateStyle"
+
+	q := `UPDATE websites SET background_color = ?, font = ? WHERE alias = ?`
+
+	_, err := s.db.Exec(q, backgroundColor, font, alias)
+
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) GetWebsiteStyle(alias string) (backgroundColor, font string, err error) {
+	const op = "storage.sqlite.GetWebsiteStyle"
+
+	q := `SELECT background_color, font FROM websites WHERE alias=?`
+
+	row := s.db.QueryRow(q, alias)
+
+	if err = row.Scan(&backgroundColor, &font); err != nil {
+		return "", "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return backgroundColor, font, nil
 }

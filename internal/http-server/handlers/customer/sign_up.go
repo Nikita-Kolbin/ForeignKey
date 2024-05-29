@@ -44,48 +44,42 @@ func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("empty request"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to decode request"))
-
 			return
 		}
 
 		websiteId, _, err := cc.GetWebsite(req.Alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to find website"))
-
 			return
 		}
 
 		err = cc.CreateCustomers(websiteId, req.Email, req.Password)
 		if errors.Is(err, storage.ErrInvalidEmail) {
 			log.Error("email is invalid", slog.String("email", req.Email))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("email is invalid"))
-
 			return
 		}
-		if errors.Is(err, storage.ErrLoginTaken) {
+		if errors.Is(err, storage.ErrEmailRegistered) {
 			log.Error("email is already taken", slog.String("email", req.Email))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("email is already taken"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to create customer", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to create customer"))
-
 			return
 		}
 

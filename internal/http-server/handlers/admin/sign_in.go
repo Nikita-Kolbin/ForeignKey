@@ -47,34 +47,30 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
 			log.Error("request body is empty")
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("empty request"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to decode request body", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to decode request"))
-
 			return
 		}
 
 		id, err := ac.GetAdminId(req.Email, req.Password)
 		if err != nil {
 			log.Error("failed to get admin", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("wrong email or password"))
-
 			return
 		}
 
 		t, err := jwt_token.GenerateToken(id, jwt_token.RoleAdmin, "")
 		if err != nil {
 			log.Error("failed to generate token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to generate token"))
-
 			return
 		}
 

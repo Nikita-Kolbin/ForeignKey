@@ -40,7 +40,7 @@ func NewDownload(ig ImagesGetter, ipg ImagesPathGetter, log *slog.Logger) http.H
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
 			log.Error("can't parse id", slog.String("err", err.Error()))
-			w.WriteHeader(http.StatusBadRequest)
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid id"))
 			return
 		}
@@ -48,7 +48,7 @@ func NewDownload(ig ImagesGetter, ipg ImagesPathGetter, log *slog.Logger) http.H
 		path, err := ipg.GetImagePath(id)
 		if err != nil {
 			log.Error("can't get image path", slog.String("err", err.Error()))
-			w.WriteHeader(http.StatusBadRequest)
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid id"))
 			return
 		}
@@ -56,7 +56,7 @@ func NewDownload(ig ImagesGetter, ipg ImagesPathGetter, log *slog.Logger) http.H
 		img, err := ig.Get(path)
 		if err != nil {
 			log.Error("can't get image", slog.String("err", err.Error()))
-			w.WriteHeader(http.StatusBadRequest)
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("can't find image"))
 			return
 		}
@@ -64,11 +64,11 @@ func NewDownload(ig ImagesGetter, ipg ImagesPathGetter, log *slog.Logger) http.H
 		_, err = w.Write(img)
 		if err != nil {
 			log.Error("can't write response", slog.String("err", err.Error()))
-			w.WriteHeader(http.StatusInternalServerError)
-			render.JSON(w, r, response.Error("can't find image"))
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, response.Error("can't send image"))
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		render.Status(r, http.StatusOK)
 	}
 }

@@ -34,9 +34,6 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
 	}))
 
-	// TODO: указать статусы для всех ответов
-	// TODO: поменять некоторык еррор логги на инфо
-	// TODO: поменять некоторые пост запросы на патч и делейт
 	// TODO: вход по вк
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
@@ -48,6 +45,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Post("/api/website/create", website.NewCreate(storage, log))
 	router.Get("/api/website/aliases", website.NewGetAliases(storage, log))
 	router.Delete("/api/website/delete/{alias}", website.NewDelete(storage, log))
+	router.Patch("/api/website/set-style", website.NewSetStyle(storage, log))
+	router.Get("/api/website/get-style/{alias}", website.NewGetStyle(storage, log))
 
 	router.Post("/api/product/create", product.NewCreate(storage, log))
 	router.Get("/api/product/get-by-alias/{alias}", product.NewGetByAlias(storage, log))
@@ -60,7 +59,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Get("/api/cart/get", cart.NewGet(storage, log))
 
 	// TODO: добавить сохранение цены товара на момент заказа
-	// TODO: добавить статус заказа, уведы на почту
+	// TODO: добавить статус заказа
 	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
 	router.Get("/api/order/get", order.NewGet(storage, log))
 

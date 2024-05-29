@@ -39,7 +39,6 @@ func main() {
 	log.Info("starting service", slog.String("env", cfg.Env))
 	log.Debug("debug messages are enabled")
 
-	// TODO: прописать создание папок
 	// storage
 	storage, err := sqlite.New(cfg.StoragePath, cfg.StorageName)
 	if err != nil {
@@ -47,7 +46,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// TODO: прописать создание папок
 	// image saver
 	imageSaver, err := image.New(cfg.ImagesPath)
 	if err != nil {
@@ -55,7 +53,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// TODO: вынести пароль в переменную окружения
 	// email
 	emailSender := email.New(cfg.EmailAddress, cfg.Password, cfg.SmtpHost, cfg.SmtpPort)
 	_ = emailSender

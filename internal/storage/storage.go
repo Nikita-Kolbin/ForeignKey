@@ -3,10 +3,15 @@ package storage
 import "errors"
 
 var (
-	ErrLoginTaken   = errors.New("login is already taken")
-	ErrAliasTaken   = errors.New("alias is already taken")
-	ErrEmptyOrder   = errors.New("order is empty")
-	ErrInvalidEmail = errors.New("email is invalid")
+	ErrEmailRegistered = errors.New("email is already registered")
+	ErrAliasTaken      = errors.New("alias is already taken")
+	ErrEmptyOrder      = errors.New("order is empty")
+	ErrInvalidEmail    = errors.New("email is invalid")
+)
+
+const (
+	DefaultBackgroundColor = "white"
+	DefaultFont            = "Arial"
 )
 
 type Customer struct {
@@ -40,4 +45,43 @@ type OrderItem struct {
 type Order struct {
 	DateTime   string      `json:"date_time"`
 	OrderItems []OrderItem `json:"order_items"`
+}
+
+type Styles struct {
+	AboutUs  AboutUsStyle  `json:"about_us"`
+	Footer   FooterStyle   `json:"footer"`
+	Header   HeaderStyle   `json:"header"`
+	Products ProductsStyle `json:"products"`
+}
+
+type AboutUsStyle struct {
+	BackgroundColor string `json:"background_color"`
+	Content         string `json:"content"`
+	FontSize        string `json:"font_size"`
+	Height          string `json:"height"`
+	Width           string `json:"width"`
+}
+
+type FooterStyle struct {
+	BackgroundColor string `json:"background_color"`
+	Content         string `json:"content"`
+	FontSize        string `json:"font_size"`
+	Height          string `json:"height"`
+	Width           string `json:"width"`
+}
+
+type HeaderStyle struct {
+	BackgroundColor string `json:"background_color"`
+	Content         string `json:"content"`
+	FontSize        string `json:"font_size"`
+	Height          string `json:"height"`
+	Width           string `json:"width"`
+}
+
+type ProductsStyle struct {
+	BackgroundColor string `json:"background_color"`
+	Content         string `json:"content"`
+	FontSize        string `json:"font_size"`
+	Height          string `json:"height"`
+	Width           string `json:"width"`
 }

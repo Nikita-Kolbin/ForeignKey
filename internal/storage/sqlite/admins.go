@@ -39,7 +39,7 @@ func (s *Storage) CreateAdmin(email, password string) error {
 	_, err := s.db.Exec(q, email, hash)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return fmt.Errorf("%s: %w", op, storage.ErrLoginTaken)
+			return fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
 		}
 
 		return fmt.Errorf("%s: %w", op, err)

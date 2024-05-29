@@ -532,6 +532,72 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/website/get-style/{alias}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "website"
+                ],
+                "summary": "Get website style",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/website.GetStyleResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/website/set-style": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "website"
+                ],
+                "summary": "Change style",
+                "parameters": [
+                    {
+                        "description": "style to website",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/website.StyleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -831,6 +897,37 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "alias": {
+                    "type": "string"
+                }
+            }
+        },
+        "website.GetStyleResponse": {
+            "type": "object",
+            "properties": {
+                "background_color": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "font": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "website.StyleRequest": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "background_color": {
+                    "type": "string"
+                },
+                "font": {
                     "type": "string"
                 }
             }

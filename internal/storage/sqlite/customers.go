@@ -45,7 +45,7 @@ func (s *Storage) CreateCustomers(websiteId int, email, password string) error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	if e {
-		return fmt.Errorf("%s: %w", op, storage.ErrLoginTaken)
+		return fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
 	}
 
 	hash := generatePasswordHash(password)

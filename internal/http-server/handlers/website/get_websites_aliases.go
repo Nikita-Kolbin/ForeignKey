@@ -38,40 +38,34 @@ func NewGetAliases(ag AliasesGetter, log *slog.Logger) http.HandlerFunc {
 		token, err := jwt_token.GetTokenFromRequest(auth)
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
-
 			render.Status(r, http.StatusBadRequest)
-
 			render.JSON(w, r, response.Error("invalid token format"))
-
 			return
 		}
 
 		id, role, _, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token"))
-
 			return
 		}
 		if role != jwt_token.RoleAdmin {
 			log.Info("permission denied", slog.String("role", role))
-
+			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("permission denied"))
-
 			return
 		}
 
 		aliases, err := ag.GetWebsitesAliases(id)
 		if err != nil {
 			log.Error("failed to get aliases", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to get aliases"))
-
 			return
 		}
 
-		log.Info("give aliases", slog.Int("admin id", id))
+		log.Info("aliases given", slog.Int("admin id", id))
 
 		render.JSON(w, r, responseOK(aliases))
 	}

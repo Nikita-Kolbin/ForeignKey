@@ -41,41 +41,36 @@ func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.Handler
 		token, err := jwt_token.GetTokenFromRequest(auth)
 		if err != nil {
 			log.Error("failed to get token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token format"))
-
 			return
 		}
 
 		customerId, role, _, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("invalid token"))
-
 			return
 		}
 		if role != jwt_token.RoleCustomer {
 			log.Info("permission denied", slog.String("role", role))
-
+			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("only customers can make order"))
-
 			return
 		}
 
 		err = om.CreateOrder(customerId)
 		if errors.Is(err, storage.ErrEmptyOrder) {
 			log.Error("failed to make order", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("order is empty"))
-
 			return
 		}
 		if err != nil {
 			log.Error("failed to make order", slog.String("err", err.Error()))
-
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("failed to make order"))
-
 			return
 		}
 
