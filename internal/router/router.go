@@ -30,7 +30,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	// CORS
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins: []string{"*", "https://*", "http://*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
 	}))
 
