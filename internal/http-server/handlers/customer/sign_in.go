@@ -29,7 +29,7 @@ type SignInResponse struct {
 
 // NewSignIn godoc
 // @Summary      SingIn customer
-// @Tags         auth
+// @Tags         customer
 // @Accept       json
 // @Produce      json
 // @Param input body SignInRequest true "sign in"

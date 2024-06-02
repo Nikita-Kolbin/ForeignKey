@@ -101,7 +101,39 @@ func (s *Storage) GetCustomer(id int) (*storage.Customer, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &storage.Customer{WebsiteId: websiteId, Email: email}, nil
+	return &storage.Customer{Id: id, WebsiteId: websiteId, Email: email}, nil
+}
+
+func (s *Storage) GetCustomersByWebsite(websiteId int) ([]storage.Customer, error) {
+	const op = "storage.sqlite.GetCustomersByWebsite"
+
+	q := `SELECT id, email FROM customers WHERE website_id=?;`
+
+	rows, err := s.db.Query(q, websiteId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	res := make([]storage.Customer, 0)
+
+	var id int
+	var email string
+
+	for rows.Next() {
+		if err = rows.Scan(&id, &email); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		c := storage.Customer{
+			Id:        id,
+			WebsiteId: websiteId,
+			Email:     email,
+		}
+
+		res = append(res, c)
+	}
+
+	return res, nil
 }
 
 func (s *Storage) CustomerIsExists(websiteId int, email string) (bool, error) {

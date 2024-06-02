@@ -48,6 +48,17 @@ definitions:
       status:
         type: string
     type: object
+  customer.GetResponse:
+    properties:
+      customers:
+        items:
+          $ref: '#/definitions/storage.Customer'
+        type: array
+      error:
+        type: string
+      status:
+        type: string
+    type: object
   customer.SignInRequest:
     properties:
       alias:
@@ -142,10 +153,23 @@ definitions:
       product:
         $ref: '#/definitions/storage.ProductInfo'
     type: object
+  storage.Customer:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      website_id:
+        type: integer
+    type: object
   storage.Order:
     properties:
+      customer_id:
+        type: integer
       date_time:
         type: string
+      id:
+        type: integer
       order_items:
         items:
           $ref: '#/definitions/storage.OrderItem'
@@ -239,7 +263,7 @@ paths:
             $ref: '#/definitions/admin.SignInResponse'
       summary: SingIn admin
       tags:
-      - auth
+      - admin
   /admin/sign-up:
     post:
       consumes:
@@ -260,7 +284,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: SingUp admin
       tags:
-      - auth
+      - admin
   /cart/add:
     post:
       consumes:
@@ -324,6 +348,26 @@ paths:
       summary: Get all cart items
       tags:
       - cart
+  /customer/get-by-alias/{alias}:
+    get:
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/customer.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all customers by alias
+      tags:
+      - customer
   /customer/sign-in:
     post:
       consumes:
@@ -344,7 +388,7 @@ paths:
             $ref: '#/definitions/customer.SignInResponse'
       summary: SingIn customer
       tags:
-      - auth
+      - customer
   /customer/sign-up:
     post:
       consumes:
@@ -365,7 +409,7 @@ paths:
             $ref: '#/definitions/response.Response'
       summary: SingUp customer
       tags:
-      - auth
+      - customer
   /image/download/{id}:
     get:
       description: При удачном запросе вернет картинку в body со статусом 200, при
@@ -427,6 +471,26 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get all orders
+      tags:
+      - order
+  /order/get-by-alias/{alias}:
+    get:
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/order.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all orders by alias
       tags:
       - order
   /order/make:

@@ -27,7 +27,7 @@ type SignInResponse struct {
 
 // NewSignIn godoc
 // @Summary      SingIn admin
-// @Tags         auth
+// @Tags         admin
 // @Accept       json
 // @Produce      json
 // @Param input body SignInRequest true "sign in"

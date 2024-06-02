@@ -24,7 +24,7 @@ type SignUpRequest struct {
 
 // NewSignUp godoc
 // @Summary      SingUp customer
-// @Tags         auth
+// @Tags         customer
 // @Accept       json
 // @Produce      json
 // @Param input body SignUpRequest true "sign up"

@@ -15,6 +15,7 @@ const (
 )
 
 type Customer struct {
+	Id        int    `json:"id"`
 	WebsiteId int    `json:"website_id"`
 	Email     string `json:"email"`
 }
@@ -43,6 +44,8 @@ type OrderItem struct {
 }
 
 type Order struct {
+	Id         int         `json:"id"`
+	CustomerId int         `json:"customer_id"`
 	DateTime   string      `json:"date_time"`
 	OrderItems []OrderItem `json:"order_items"`
 }

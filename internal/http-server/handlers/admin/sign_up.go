@@ -22,7 +22,7 @@ type SignUpRequest struct {
 
 // NewSignUp godoc
 // @Summary      SingUp admin
-// @Tags         auth
+// @Tags         admin
 // @Accept       json
 // @Produce      json
 // @Param input body SignUpRequest true "sign up"

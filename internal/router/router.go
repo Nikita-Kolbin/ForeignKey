@@ -53,6 +53,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 
 	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
+	router.Get("/api/customer/get-by-alias/{alias}", customer.NewGetByAlias(storage, log))
 
 	router.Post("/api/cart/add", cart.NewAdd(storage, log))
 	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))
@@ -62,6 +63,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	// TODO: добавить статус заказа
 	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
 	router.Get("/api/order/get", order.NewGet(storage, log))
+	router.Get("/api/order/get-by-alias/{alias}", order.NewGetByAlias(storage, log))
 
 	return router
 }

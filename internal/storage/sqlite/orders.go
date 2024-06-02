@@ -112,11 +112,55 @@ func (s *Storage) GetOrders(customerId int) ([]storage.Order, error) {
 		}
 
 		o := storage.Order{
+			Id:         orderId,
+			CustomerId: customerId,
 			DateTime:   dateTimes[i],
 			OrderItems: orderItems,
 		}
 
 		res = append(res, o)
+	}
+
+	return res, nil
+}
+
+func (s *Storage) GetOrdersByWebsite(websiteId int) ([]storage.Order, error) {
+	const op = "storage.sqlite.GetOrdersByWebsite"
+
+	q := `
+		SELECT id, customer_id, date_time
+		FROM orders 
+		WHERE (SELECT website_id FROM customers WHERE customers.id=orders.customer_id)=?;
+	`
+
+	rows, err := s.db.Query(q, websiteId)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	res := make([]storage.Order, 0)
+
+	var id, customerId int
+	var dateTime string
+
+	for rows.Next() {
+		if err = rows.Scan(&id, &customerId, &dateTime); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		orderItems, err := s.GetOrderItems(id)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		order := storage.Order{
+			Id:         id,
+			CustomerId: customerId,
+			DateTime:   dateTime,
+			OrderItems: orderItems,
+		}
+
+		res = append(res, order)
 	}
 
 	return res, nil

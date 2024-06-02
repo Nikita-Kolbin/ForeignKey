@@ -24,7 +24,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "admin"
                 ],
                 "summary": "SingIn admin",
                 "parameters": [
@@ -57,7 +57,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "admin"
                 ],
                 "summary": "SingUp admin",
                 "parameters": [
@@ -183,6 +183,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/customer/get-by-alias/{alias}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get all customers by alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/customer.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/customer/sign-in": {
             "post": {
                 "consumes": [
@@ -192,7 +225,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "customer"
                 ],
                 "summary": "SingIn customer",
                 "parameters": [
@@ -225,7 +258,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "customer"
                 ],
                 "summary": "SingUp customer",
                 "parameters": [
@@ -335,6 +368,39 @@ const docTemplate = `{
                     "order"
                 ],
                 "summary": "Get all orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/order.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/get-by-alias/{alias}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Get all orders by alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -676,6 +742,23 @@ const docTemplate = `{
                 }
             }
         },
+        "customer.GetResponse": {
+            "type": "object",
+            "properties": {
+                "customers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/storage.Customer"
+                    }
+                },
+                "error": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "customer.SignInRequest": {
             "type": "object",
             "properties": {
@@ -822,11 +905,31 @@ const docTemplate = `{
                 }
             }
         },
+        "storage.Customer": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "website_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "storage.Order": {
             "type": "object",
             "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
                 "date_time": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "order_items": {
                     "type": "array",
