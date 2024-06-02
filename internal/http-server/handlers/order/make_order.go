@@ -30,7 +30,7 @@ type EmailSender interface {
 // @Router /order/make [post]
 func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.cart.NewMakeOrder"
+		const op = "handlers.order.NewMakeOrder"
 
 		log = log.With(
 			slog.String("op", op),
@@ -78,16 +78,24 @@ func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.Handler
 
 		render.JSON(w, r, response.OK())
 
-		customer, err := om.GetCustomer(customerId)
-		if err != nil {
-			log.Error("can't get customer", slog.String("err", err.Error()))
-			return
-		}
+		go sendEmail(om, es, log, customerId)
+	}
+}
 
-		err = es.Send(customer.Email, "Заказ оформлен")
-		if err != nil {
-			log.Error("can't send message", slog.String("err", err.Error()))
-			return
-		}
+func sendEmail(om OrdersMaker, es EmailSender, log *slog.Logger, customerId int) {
+	const op = "handlers.order.NewMakeOrder"
+
+	log = log.With(
+		slog.String("op", op),
+	)
+
+	customer, err := om.GetCustomer(customerId)
+	if err != nil {
+		log.Error("can't get customer", slog.String("err", err.Error()))
+	}
+
+	err = es.Send(customer.Email, "Заказ оформлен")
+	if err != nil {
+		log.Error("can't send message", slog.String("err", err.Error()))
 	}
 }
