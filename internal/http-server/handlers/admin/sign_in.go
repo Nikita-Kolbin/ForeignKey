@@ -20,7 +20,7 @@ type SignInRequest struct {
 	Password string `json:"password"`
 }
 
-type SignInResponse struct {
+type TokenResponse struct {
 	response.Response
 	Token string `json:"token"`
 }
@@ -31,7 +31,7 @@ type SignInResponse struct {
 // @Accept       json
 // @Produce      json
 // @Param input body SignInRequest true "sign in"
-// @Success      200  {object}   SignInResponse
+// @Success      200  {object}   TokenResponse
 // @Router       /admin/sign-in [post]
 func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -76,12 +76,12 @@ func NewSignIn(ac AdminsGetter, log *slog.Logger) http.HandlerFunc {
 
 		log.Info("admin sing in", slog.String("email", req.Email))
 
-		render.JSON(w, r, responseOK(t))
+		render.JSON(w, r, responseWithTokenOK(t))
 	}
 }
 
-func responseOK(token string) SignInResponse {
-	return SignInResponse{
+func responseWithTokenOK(token string) TokenResponse {
+	return TokenResponse{
 		Response: response.OK(),
 		Token:    token,
 	}

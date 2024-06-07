@@ -1,6 +1,7 @@
 package customer
 
 import (
+	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
 	"ForeignKey/internal/storage"
 	"errors"
@@ -12,7 +13,7 @@ import (
 )
 
 type CustomersCreator interface {
-	CreateCustomers(websiteId int, login, password string) error
+	CreateCustomers(websiteId int, email, password string) (int, error)
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
@@ -28,7 +29,7 @@ type SignUpRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param input body SignUpRequest true "sign up"
-// @Success      200  {object}   response.Response
+// @Success      200  {object}   TokenResponse
 // @Router       /customer/sign-up [post]
 func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +64,7 @@ func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = cc.CreateCustomers(websiteId, req.Email, req.Password)
+		id, err := cc.CreateCustomers(websiteId, req.Email, req.Password)
 		if errors.Is(err, storage.ErrInvalidEmail) {
 			log.Error("email is invalid", slog.String("email", req.Email))
 			render.Status(r, http.StatusBadRequest)
@@ -83,8 +84,16 @@ func NewSignUp(cc CustomersCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
+		t, err := jwt_token.GenerateToken(id, jwt_token.RoleCustomer, req.Alias)
+		if err != nil {
+			log.Error("failed to generate token", slog.String("err", err.Error()))
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, response.Error("failed to generate token"))
+			return
+		}
+
 		log.Info("customer created", slog.String("email", req.Email))
 
-		render.JSON(w, r, response.OK())
+		render.JSON(w, r, responseWithTokenOK(t))
 	}
 }

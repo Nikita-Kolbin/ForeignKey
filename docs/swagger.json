@@ -59,7 +59,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/admin.SignInResponse"
+                            "$ref": "#/definitions/admin.TokenResponse"
                         }
                     }
                 }
@@ -92,7 +92,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/admin.TokenResponse"
                         }
                     }
                 }
@@ -298,7 +298,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/customer.SignInResponse"
+                            "$ref": "#/definitions/customer.TokenResponse"
                         }
                     }
                 }
@@ -331,7 +331,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/customer.TokenResponse"
                         }
                     }
                 }
@@ -747,7 +747,18 @@
                 }
             }
         },
-        "admin.SignInResponse": {
+        "admin.SignUpRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "admin.TokenResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -757,17 +768,6 @@
                     "type": "string"
                 },
                 "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "admin.SignUpRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
                     "type": "string"
                 }
             }
@@ -862,20 +862,6 @@
                 }
             }
         },
-        "customer.SignInResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
         "customer.SignUpRequest": {
             "type": "object",
             "properties": {
@@ -886,6 +872,20 @@
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "customer.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }

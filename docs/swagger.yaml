@@ -16,20 +16,20 @@ definitions:
       password:
         type: string
     type: object
-  admin.SignInResponse:
+  admin.SignUpRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  admin.TokenResponse:
     properties:
       error:
         type: string
       status:
         type: string
       token:
-        type: string
-    type: object
-  admin.SignUpRequest:
-    properties:
-      email:
-        type: string
-      password:
         type: string
     type: object
   admin.UpdateProfileRequest:
@@ -90,15 +90,6 @@ definitions:
       password:
         type: string
     type: object
-  customer.SignInResponse:
-    properties:
-      error:
-        type: string
-      status:
-        type: string
-      token:
-        type: string
-    type: object
   customer.SignUpRequest:
     properties:
       alias:
@@ -106,6 +97,15 @@ definitions:
       email:
         type: string
       password:
+        type: string
+    type: object
+  customer.TokenResponse:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+      token:
         type: string
     type: object
   image.UploadResponse:
@@ -313,7 +313,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/admin.SignInResponse'
+            $ref: '#/definitions/admin.TokenResponse'
       summary: SingIn admin
       tags:
       - admin
@@ -334,7 +334,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/admin.TokenResponse'
       summary: SingUp admin
       tags:
       - admin
@@ -461,7 +461,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/customer.SignInResponse'
+            $ref: '#/definitions/customer.TokenResponse'
       summary: SingIn customer
       tags:
       - customer
@@ -482,7 +482,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/customer.TokenResponse'
       summary: SingUp customer
       tags:
       - customer

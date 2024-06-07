@@ -30,27 +30,31 @@ func (s *Storage) initAdmins() error {
 	return nil
 }
 
-func (s *Storage) CreateAdmin(email, password string) error {
+func (s *Storage) CreateAdmin(email, password string) (int, error) {
 	const op = "storage.sqlite.CreateAdmin"
 
 	q := `INSERT INTO admins (email, password_hash) VALUES (?, ?)`
 
 	if !validEmail(email) {
-		return storage.ErrInvalidEmail
+		return 0, storage.ErrInvalidEmail
 	}
 
 	hash := generatePasswordHash(password)
 
-	_, err := s.db.Exec(q, email, hash)
+	r, err := s.db.Exec(q, email, hash)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
 		}
 
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return nil
+	id, err := r.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+	return int(id), nil
 }
 
 func (s *Storage) GetAdminId(email, password string) (int, error) {

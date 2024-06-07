@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
 	"ForeignKey/internal/storage"
 	"errors"
@@ -12,7 +13,7 @@ import (
 )
 
 type AdminsCreator interface {
-	CreateAdmin(username, password string) error
+	CreateAdmin(email, password string) (int, error)
 }
 
 type SignUpRequest struct {
@@ -26,7 +27,7 @@ type SignUpRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param input body SignUpRequest true "sign up"
-// @Success      200  {object}   response.Response
+// @Success      200  {object}   TokenResponse
 // @Router       /admin/sign-up [post]
 func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +54,7 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = ac.CreateAdmin(req.Email, req.Password)
+		id, err := ac.CreateAdmin(req.Email, req.Password)
 		if errors.Is(err, storage.ErrInvalidEmail) {
 			log.Error("email is invalid", slog.String("email", req.Email))
 			render.Status(r, http.StatusBadRequest)
@@ -73,8 +74,16 @@ func NewSignUp(ac AdminsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
+		t, err := jwt_token.GenerateToken(id, jwt_token.RoleAdmin, "")
+		if err != nil {
+			log.Error("failed to generate token", slog.String("err", err.Error()))
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, response.Error("failed to generate token"))
+			return
+		}
+
 		log.Info("admin created", slog.String("email", req.Email))
 
-		render.JSON(w, r, response.OK())
+		render.JSON(w, r, responseWithTokenOK(t))
 	}
 }

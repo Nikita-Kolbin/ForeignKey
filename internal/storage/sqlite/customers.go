@@ -26,51 +26,51 @@ func (s *Storage) initCustomers() error {
 	return nil
 }
 
-func (s *Storage) CreateCustomers(websiteId int, email, password string) error {
+func (s *Storage) CreateCustomers(websiteId int, email, password string) (int, error) {
 	const op = "storage.sqlite.CreateCustomers"
 
 	q := `INSERT INTO customers (website_id, email, password_hash) VALUES (?, ?, ?);`
 
 	if !validEmail(email) {
-		return storage.ErrInvalidEmail
+		return 0, storage.ErrInvalidEmail
 	}
 
 	tx, err := s.db.Begin()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	e, err := s.CustomerIsExists(websiteId, email)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	if e {
-		return fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrEmailRegistered)
 	}
 
 	hash := generatePasswordHash(password)
 
 	res, err := tx.Exec(q, websiteId, email, hash)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	customerId, err := res.LastInsertId()
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = s.CreateCart(tx, int(customerId)); err != nil {
 		_ = tx.Rollback()
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err = tx.Commit(); err != nil {
 		_ = tx.Rollback()
-		return fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return nil
+	return int(customerId), nil
 }
 
 func (s *Storage) GetCustomerId(websiteId int, email, password string) (int, error) {

@@ -66,7 +66,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/admin.SignInResponse"
+                            "$ref": "#/definitions/admin.TokenResponse"
                         }
                     }
                 }
@@ -99,7 +99,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/admin.TokenResponse"
                         }
                     }
                 }
@@ -305,7 +305,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/customer.SignInResponse"
+                            "$ref": "#/definitions/customer.TokenResponse"
                         }
                     }
                 }
@@ -338,7 +338,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/customer.TokenResponse"
                         }
                     }
                 }
@@ -754,7 +754,18 @@ const docTemplate = `{
                 }
             }
         },
-        "admin.SignInResponse": {
+        "admin.SignUpRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "admin.TokenResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -764,17 +775,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "admin.SignUpRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
                     "type": "string"
                 }
             }
@@ -869,20 +869,6 @@ const docTemplate = `{
                 }
             }
         },
-        "customer.SignInResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
         "customer.SignUpRequest": {
             "type": "object",
             "properties": {
@@ -893,6 +879,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "customer.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "token": {
                     "type": "string"
                 }
             }
