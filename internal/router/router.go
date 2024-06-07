@@ -38,6 +38,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	// handlers
 	router.Post("/api/admin/sign-up", admin.NewSignUp(storage, log))
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
+	router.Get("/api/admin/get-profile", admin.NewGetProfile(storage, log))
+	router.Put("/api/admin/update-profile", admin.NewUpdateProfile(storage, log))
 
 	router.Post("/api/image/upload", img.NewUpload(imageSaver, storage, log))
 	router.Get("/api/image/download/{id}", img.NewDownload(imageSaver, storage, log))

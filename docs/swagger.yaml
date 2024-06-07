@@ -1,5 +1,14 @@
 basePath: /api
 definitions:
+  admin.GetProfileResponse:
+    properties:
+      error:
+        type: string
+      profile:
+        $ref: '#/definitions/storage.Admin'
+      status:
+        type: string
+    type: object
   admin.SignInRequest:
     properties:
       email:
@@ -21,6 +30,19 @@ definitions:
       email:
         type: string
       password:
+        type: string
+    type: object
+  admin.UpdateProfileRequest:
+    properties:
+      city:
+        type: string
+      father_name:
+        type: string
+      first_name:
+        type: string
+      image_id:
+        type: integer
+      last_name:
         type: string
     type: object
   cart.AddRequest:
@@ -142,6 +164,23 @@ definitions:
       status:
         type: string
     type: object
+  storage.Admin:
+    properties:
+      city:
+        type: string
+      email:
+        type: string
+      father_name:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      image_id:
+        type: integer
+      last_name:
+        type: string
+    type: object
   storage.CartItem:
     properties:
       cart_id:
@@ -243,6 +282,20 @@ info:
   title: ForeignKey
   version: "1.0"
 paths:
+  /admin/get-profile:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/admin.GetProfileResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get admin profile
+      tags:
+      - admin
   /admin/sign-in:
     post:
       consumes:
@@ -283,6 +336,29 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: SingUp admin
+      tags:
+      - admin
+  /admin/update-profile:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: new profile data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/admin.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update admin profile
       tags:
       - admin
   /cart/add:

@@ -14,6 +14,16 @@ const (
 	DefaultFont            = "Arial"
 )
 
+type Admin struct {
+	Id         int    `json:"id"`
+	Email      string `json:"email"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	FatherName string `json:"father_name"`
+	City       string `json:"city"`
+	ImageId    int    `json:"image_id"`
+}
+
 type Customer struct {
 	Id        int    `json:"id"`
 	WebsiteId int    `json:"website_id"`
@@ -48,43 +58,4 @@ type Order struct {
 	CustomerId int         `json:"customer_id"`
 	DateTime   string      `json:"date_time"`
 	OrderItems []OrderItem `json:"order_items"`
-}
-
-type Styles struct {
-	AboutUs  AboutUsStyle  `json:"about_us"`
-	Footer   FooterStyle   `json:"footer"`
-	Header   HeaderStyle   `json:"header"`
-	Products ProductsStyle `json:"products"`
-}
-
-type AboutUsStyle struct {
-	BackgroundColor string `json:"background_color"`
-	Content         string `json:"content"`
-	FontSize        string `json:"font_size"`
-	Height          string `json:"height"`
-	Width           string `json:"width"`
-}
-
-type FooterStyle struct {
-	BackgroundColor string `json:"background_color"`
-	Content         string `json:"content"`
-	FontSize        string `json:"font_size"`
-	Height          string `json:"height"`
-	Width           string `json:"width"`
-}
-
-type HeaderStyle struct {
-	BackgroundColor string `json:"background_color"`
-	Content         string `json:"content"`
-	FontSize        string `json:"font_size"`
-	Height          string `json:"height"`
-	Width           string `json:"width"`
-}
-
-type ProductsStyle struct {
-	BackgroundColor string `json:"background_color"`
-	Content         string `json:"content"`
-	FontSize        string `json:"font_size"`
-	Height          string `json:"height"`
-	Width           string `json:"width"`
 }
