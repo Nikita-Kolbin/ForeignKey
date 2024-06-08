@@ -66,6 +66,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
 	router.Get("/api/order/get", order.NewGet(storage, log))
 	router.Get("/api/order/get-by-alias/{alias}", order.NewGetByAlias(storage, log))
+	router.Patch("/api/order/set-status", order.NewSetStatus(storage, log))
 
 	return router
 }

@@ -80,6 +80,20 @@ func (s *Storage) GetWebsite(alias string) (websiteId, adminId int, err error) {
 	return websiteId, adminId, nil
 }
 
+func (s *Storage) GetWebsiteById(id int) (adminId int, alias string, err error) {
+	const op = "storage.sqlite.GetWebsiteById"
+
+	q := `SELECT admin_id, alias FROM websites WHERE id=?`
+
+	row := s.db.QueryRow(q, id)
+
+	if err = row.Scan(&adminId, &alias); err != nil {
+		return 0, "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	return adminId, alias, nil
+}
+
 func (s *Storage) DeleteWebsite(alias string) error {
 	const op = "storage.sqlite.DeleteWebsite"
 

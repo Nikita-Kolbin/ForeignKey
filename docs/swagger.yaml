@@ -128,6 +128,13 @@ definitions:
       status:
         type: string
     type: object
+  order.UpdateStatusRequest:
+    properties:
+      order_id:
+        type: integer
+      status:
+        type: integer
+    type: object
   product.CreateRequest:
     properties:
       alias:
@@ -213,6 +220,8 @@ definitions:
         items:
           $ref: '#/definitions/storage.OrderItem'
         type: array
+      status:
+        type: integer
     type: object
   storage.OrderItem:
     properties:
@@ -582,6 +591,29 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Make order
+      tags:
+      - order
+  /order/set-status:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: style to website
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/order.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change order status
       tags:
       - order
   /product/create:

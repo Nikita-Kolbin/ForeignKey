@@ -498,6 +498,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/order/set-status": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Change order status",
+                "parameters": [
+                    {
+                        "description": "style to website",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/order.UpdateStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/product/create": {
             "post": {
                 "security": [
@@ -928,6 +966,17 @@ const docTemplate = `{
                 }
             }
         },
+        "order.UpdateStatusRequest": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "product.CreateRequest": {
             "type": "object",
             "properties": {
@@ -1058,6 +1107,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/storage.OrderItem"
                     }
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         },

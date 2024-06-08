@@ -57,5 +57,18 @@ type Order struct {
 	Id         int         `json:"id"`
 	CustomerId int         `json:"customer_id"`
 	DateTime   string      `json:"date_time"`
+	Status     int         `json:"status"`
 	OrderItems []OrderItem `json:"order_items"`
 }
+
+type OrderStatus int
+
+const (
+	StatusAwaitingConfirm OrderStatus = iota
+	StatusAcceptedForProcessing
+	StatusInProgress
+	StatusMade
+	StatusSent
+	StatusDelivered
+	StatusUnusualSituation
+)
