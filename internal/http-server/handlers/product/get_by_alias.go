@@ -11,7 +11,7 @@ import (
 )
 
 type ProductsGetter interface {
-	GetProducts(websiteId int) ([]storage.ProductInfo, error)
+	GetActiveProducts(websiteId int) ([]storage.ProductInfo, error)
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
@@ -22,7 +22,7 @@ type GetResponse struct {
 
 // NewGetByAlias godoc
 // @Summary GetByAlias
-// @Description Возвращает все товары сайта по алиасу
+// @Description Возвращает ТОЛЬКО АКТИВНЫЕ товары сайта по алиасу
 // @Tags product
 // @Produce  json
 // @Param alias path string true "website alias"
@@ -30,7 +30,7 @@ type GetResponse struct {
 // @Router /product/get-by-alias/{alias} [get]
 func NewGetByAlias(pg ProductsGetter, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.products.NewCreate"
+		const op = "handlers.products.NewGetByAlias"
 
 		log = log.With(
 			slog.String("op", op),
@@ -47,7 +47,7 @@ func NewGetByAlias(pg ProductsGetter, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		products, err := pg.GetProducts(websiteId)
+		products, err := pg.GetActiveProducts(websiteId)
 		if err != nil {
 			log.Error("failed to get products", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)

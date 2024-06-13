@@ -9,6 +9,7 @@ var (
 	ErrInvalidEmail     = errors.New("email is invalid")
 	ErrInvalidImagesIs  = errors.New("invalid images id")
 	ErrAdminHaveWebsite = errors.New("admin already have website")
+	ErrInvalidActive    = errors.New("invalid active status")
 )
 
 const (
@@ -39,6 +40,7 @@ type ProductInfo struct {
 	Description string `json:"description"`
 	Price       int    `json:"price"`
 	ImagesId    string `json:"images_id"`
+	Active      int    `json:"active"`
 }
 
 type CartItem struct {

@@ -555,7 +555,7 @@ const docTemplate = `{
                 "summary": "Create product",
                 "parameters": [
                     {
-                        "description": "alias new website",
+                        "description": "product info",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -574,9 +574,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/product/get-all-by-alias/{alias}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Возвращает ВСЕ ТОВАРЫ сайта по алиасу, только для админа",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "GetAllByAlias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/product.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/product/get-by-alias/{alias}": {
             "get": {
-                "description": "Возвращает все товары сайта по алиасу",
+                "description": "Возвращает ТОЛЬКО АКТИВНЫЕ товары сайта по алиасу",
                 "produces": [
                     "application/json"
                 ],
@@ -598,6 +632,44 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/product.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/set-active": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Change product active status",
+                "parameters": [
+                    {
+                        "description": "active status",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/product.UpdateActiveRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1022,6 +1094,20 @@ const docTemplate = `{
                 }
             }
         },
+        "product.UpdateActiveRequest": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "integer"
+                },
+                "alias": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "response.Response": {
             "type": "object",
             "properties": {
@@ -1133,6 +1219,9 @@ const docTemplate = `{
         "storage.ProductInfo": {
             "type": "object",
             "properties": {
+                "active": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },

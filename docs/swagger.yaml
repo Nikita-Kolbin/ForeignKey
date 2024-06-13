@@ -164,6 +164,15 @@ definitions:
       price:
         type: integer
     type: object
+  product.UpdateActiveRequest:
+    properties:
+      active:
+        type: integer
+      alias:
+        type: string
+      product_id:
+        type: integer
+    type: object
   response.Response:
     properties:
       error:
@@ -236,6 +245,8 @@ definitions:
     type: object
   storage.ProductInfo:
     properties:
+      active:
+        type: integer
       description:
         type: string
       id:
@@ -621,7 +632,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: alias new website
+      - description: product info
         in: body
         name: input
         required: true
@@ -639,9 +650,30 @@ paths:
       summary: Create product
       tags:
       - product
+  /product/get-all-by-alias/{alias}:
+    get:
+      description: Возвращает ВСЕ ТОВАРЫ сайта по алиасу, только для админа
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/product.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: GetAllByAlias
+      tags:
+      - product
   /product/get-by-alias/{alias}:
     get:
-      description: Возвращает все товары сайта по алиасу
+      description: Возвращает ТОЛЬКО АКТИВНЫЕ товары сайта по алиасу
       parameters:
       - description: website alias
         in: path
@@ -656,6 +688,29 @@ paths:
           schema:
             $ref: '#/definitions/product.GetResponse'
       summary: GetByAlias
+      tags:
+      - product
+  /product/set-active:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: active status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/product.UpdateActiveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change product active status
       tags:
       - product
   /website/aliases:

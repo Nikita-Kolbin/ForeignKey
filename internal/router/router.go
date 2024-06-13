@@ -52,6 +52,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 
 	router.Post("/api/product/create", product.NewCreate(storage, log))
 	router.Get("/api/product/get-by-alias/{alias}", product.NewGetByAlias(storage, log))
+	router.Get("/api/product/get-all-by-alias/{alias}", product.NewGetAllByAlias(storage, log))
+	router.Patch("/api/product/set-active", product.NewSetActive(storage, log))
 
 	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))

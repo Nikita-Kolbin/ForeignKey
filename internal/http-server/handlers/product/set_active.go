@@ -12,42 +12,36 @@ import (
 	"net/http"
 )
 
-type ProductsCreator interface {
-	CreateProduct(name, description, imagesId string, websiteId, price int) error
+type ActiveChanger interface {
+	SetProductActive(productId, active int) error
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
-type CreateRequest struct {
-	Alias       string `json:"alias"`
-	ProductInfo Info   `json:"product_info"`
+type UpdateActiveRequest struct {
+	Alias     string `json:"alias"`
+	ProductId int    `json:"product_id"`
+	Active    int    `json:"active"`
 }
 
-type Info struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Price       int    `json:"price"`
-	ImagesId    string `json:"images_id"`
-}
-
-// NewCreate godoc
-// @Summary Create product
+// NewSetActive godoc
+// @Summary Change product active status
 // @Security ApiKeyAuth
 // @Tags product
 // @Accept json
 // @Produce  json
-// @Param input body CreateRequest true "product info"
+// @Param input body UpdateActiveRequest true "active status"
 // @Success 200 {object} response.Response
-// @Router /product/create [post]
-func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
+// @Router /product/set-active [patch]
+func NewSetActive(ac ActiveChanger, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.products.NewCreate"
+		const op = "handlers.product.NewSetActive"
 
 		log = log.With(
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
 
-		var req CreateRequest
+		var req UpdateActiveRequest
 
 		err := render.DecodeJSON(r.Body, &req)
 		if errors.Is(err, io.EOF) {
@@ -86,7 +80,7 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		websiteId, adminId, err := pc.GetWebsite(req.Alias)
+		_, adminId, err := ac.GetWebsite(req.Alias)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)
@@ -100,22 +94,21 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		pi := req.ProductInfo
-		err = pc.CreateProduct(pi.Name, pi.Description, pi.ImagesId, websiteId, pi.Price)
-		if errors.Is(err, storage.ErrInvalidImagesIs) {
-			log.Error("failed to create product", slog.String("err", err.Error()))
+		err = ac.SetProductActive(req.ProductId, req.Active)
+		if errors.Is(err, storage.ErrInvalidActive) {
+			log.Error("failed to set active", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, response.Error("invalid images id"))
+			render.JSON(w, r, response.Error("invalid active"))
 			return
 		}
 		if err != nil {
-			log.Error("failed to create product", slog.String("err", err.Error()))
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, response.Error("failed to create product"))
+			log.Error("failed to set active", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("failed to set active"))
 			return
 		}
 
-		log.Info("product created", slog.String("website alias", req.Alias))
+		log.Info("active changed", slog.Int("product id", req.ProductId))
 
 		render.JSON(w, r, response.OK())
 	}
