@@ -7,6 +7,7 @@ var (
 	ErrAliasTaken      = errors.New("alias is already taken")
 	ErrEmptyOrder      = errors.New("order is empty")
 	ErrInvalidEmail    = errors.New("email is invalid")
+	ErrInvalidImagesIs = errors.New("invalid images id")
 )
 
 const (
@@ -36,7 +37,7 @@ type ProductInfo struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`
-	ImageId     int    `json:"image_id"`
+	ImagesId    string `json:"images_id"`
 }
 
 type CartItem struct {
@@ -61,10 +62,8 @@ type Order struct {
 	OrderItems []OrderItem `json:"order_items"`
 }
 
-type OrderStatus int
-
 const (
-	StatusAwaitingConfirm OrderStatus = iota
+	StatusAwaitingConfirm int = iota
 	StatusAcceptedForProcessing
 	StatusInProgress
 	StatusMade

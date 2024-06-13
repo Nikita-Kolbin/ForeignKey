@@ -1011,8 +1011,8 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "image_id": {
-                    "type": "integer"
+                "images_id": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -1139,8 +1139,8 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "image_id": {
-                    "type": "integer"
+                "images_id": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"

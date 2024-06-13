@@ -3,6 +3,7 @@ package product
 import (
 	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/storage"
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -12,7 +13,7 @@ import (
 )
 
 type ProductsCreator interface {
-	CreateProduct(name, description string, websiteId, price, imageId int) error
+	CreateProduct(name, description, imagesId string, websiteId, price int) error
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
@@ -25,7 +26,7 @@ type Info struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Price       int    `json:"price"`
-	ImageId     int    `json:"image_id"`
+	ImagesId    string `json:"images_id"`
 }
 
 // NewCreate godoc
@@ -101,7 +102,13 @@ func NewCreate(pc ProductsCreator, log *slog.Logger) http.HandlerFunc {
 		}
 
 		pi := req.ProductInfo
-		err = pc.CreateProduct(pi.Name, pi.Description, websiteId, pi.Price, pi.ImageId)
+		err = pc.CreateProduct(pi.Name, pi.Description, pi.ImagesId, websiteId, pi.Price)
+		if errors.Is(err, storage.ErrInvalidImagesIs) {
+			log.Error("failed to create product", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("invalid images id"))
+			return
+		}
 		if err != nil {
 			log.Error("failed to create product", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
