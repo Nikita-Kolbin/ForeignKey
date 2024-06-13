@@ -29,9 +29,17 @@ func (s *Storage) initWebsites() error {
 func (s *Storage) CreateWebsite(alias string, adminId int) error {
 	const op = "storage.sqlite.CreateWebsite"
 
+	a, err := s.GetWebsitesAliases(adminId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+	if len(a) > 0 {
+		return storage.ErrAdminHaveWebsite
+	}
+
 	q := `INSERT INTO websites (alias, admin_id, background_color, font) VALUES (?, ?, ?, ?)`
 
-	_, err := s.db.Exec(q, alias, adminId, storage.DefaultBackgroundColor, storage.DefaultFont)
+	_, err = s.db.Exec(q, alias, adminId, storage.DefaultBackgroundColor, storage.DefaultFont)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", op, storage.ErrAliasTaken)

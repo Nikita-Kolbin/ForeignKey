@@ -84,6 +84,12 @@ func NewCreate(wc WebsitesCreator, log *slog.Logger) http.HandlerFunc {
 			render.JSON(w, r, response.Error("alias already taken"))
 			return
 		}
+		if errors.Is(err, storage.ErrAdminHaveWebsite) {
+			log.Error("can't have 2 websites", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("admin already have website"))
+			return
+		}
 		if err != nil {
 			log.Error("failed to create website", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
