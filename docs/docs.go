@@ -473,6 +473,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/order/get-completed/{alias}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Get completed orders by alias",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "website alias",
+                        "name": "alias",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/order.GetResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/order/make": {
             "post": {
                 "security": [

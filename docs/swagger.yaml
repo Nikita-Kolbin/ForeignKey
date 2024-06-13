@@ -589,6 +589,26 @@ paths:
       summary: Get all orders by alias
       tags:
       - order
+  /order/get-completed/{alias}:
+    get:
+      parameters:
+      - description: website alias
+        in: path
+        name: alias
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/order.GetResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get completed orders by alias
+      tags:
+      - order
   /order/make:
     post:
       description: Создает заказ исходя из корзины покупателя

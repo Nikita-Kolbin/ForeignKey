@@ -72,5 +72,6 @@ const (
 	StatusMade
 	StatusSent
 	StatusDelivered
+	StatusCompleted
 	StatusUnusualSituation
 )

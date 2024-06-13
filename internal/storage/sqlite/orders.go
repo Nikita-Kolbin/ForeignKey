@@ -4,6 +4,7 @@ import (
 	"ForeignKey/internal/storage"
 	"database/sql"
 	"fmt"
+	"sort"
 )
 
 func (s *Storage) initOrders() error {
@@ -210,6 +211,53 @@ func (s *Storage) GetOrdersByWebsite(websiteId int) ([]storage.Order, error) {
 
 		res = append(res, order)
 	}
+
+	return res, nil
+}
+
+func (s *Storage) GetCompletedOrders(websiteId int) ([]storage.Order, error) {
+	const op = "storage.sqlite.GetOrdersByWebsite"
+
+	q := `
+		SELECT id, customer_id, date_time, status
+		FROM orders 
+		WHERE (SELECT website_id FROM customers WHERE customers.id=orders.customer_id)=? AND status=?;
+	`
+
+	rows, err := s.db.Query(q, websiteId, storage.StatusCompleted)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	res := make([]storage.Order, 0)
+
+	var id, customerId, status int
+	var dateTime string
+
+	for rows.Next() {
+		if err = rows.Scan(&id, &customerId, &dateTime, &status); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		orderItems, err := s.GetOrderItems(id)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
+		order := storage.Order{
+			Id:         id,
+			CustomerId: customerId,
+			DateTime:   dateTime,
+			OrderItems: orderItems,
+			Status:     status,
+		}
+
+		res = append(res, order)
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		return res[i].Id < res[j].Id
+	})
 
 	return res, nil
 }
