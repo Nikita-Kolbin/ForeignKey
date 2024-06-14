@@ -105,7 +105,7 @@ func NewSetStatus(sc StatusChanger, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		if req.Status < 0 || req.Status > 6 {
+		if req.Status < 0 || req.Status > 7 {
 			log.Error("wrong status")
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, response.Error("wrong status"))
