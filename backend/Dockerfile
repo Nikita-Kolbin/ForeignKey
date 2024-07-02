@@ -2,7 +2,7 @@ FROM golang:1.22
 
 WORKDIR /ForeignKey
 
-COPY ./ .
+COPY .. .
 
 RUN go mod tidy
 RUN go mod vendor
