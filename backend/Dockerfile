@@ -7,6 +7,6 @@ COPY .. .
 RUN go mod tidy
 RUN go mod vendor
 
-RUN go build -o build.exe ./cmd/foreign-key/main.go
+RUN go build -o build ./cmd/foreign-key/main.go
 
-CMD ["./build.exe"]
+CMD ["./build"]

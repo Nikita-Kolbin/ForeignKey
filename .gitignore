@@ -1,7 +1,7 @@
-.idea
-storage.db
+backend/storage/storage.db
 testdir
 hello
 images
 build.exe
 storage
+.idea
