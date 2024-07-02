@@ -1,0 +1,52 @@
+.navigation-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  color: #333;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box; /* Добавлено для учета padding в ширине */
+}
+
+.navigation-header-left,
+.navigation-header-right {
+  flex: 1;
+  display: flex; /* Добавлено для правильного размещения содержимого */
+  justify-content: flex-start;
+}
+
+.navigation-header-right {
+  justify-content: flex-end; /* Добавлено для выравнивания элементов справа */
+}
+
+.navigation-header-center {
+  flex: 2;
+  display: flex; /* Добавлено для правильного размещения содержимого */
+  justify-content: center;
+}
+
+.navigation-header a {
+  color: #333;
+  text-decoration: none;
+  margin: 0 10px;
+  padding: 8px 12px;
+  white-space: nowrap; /* Добавлено для предотвращения переноса текста */
+}
+
+.navigation-header a.active {
+  color: #5A57FF;
+  border-bottom: 2px solid #5A57FF;
+}
+
+.navigation-header a.exit-link {
+  background-color: #FF5757;
+  color: #fff;
+  border-radius: 5px;
+  padding: 8px 12px;
+}
+
+.navigation-header a.exit-link:hover {
+  background-color: #d44646; /* Улучшено для лучшего эффекта наведения */
+}

@@ -1,0 +1,30 @@
+/* App.css */
+.template1, .template2 {
+    display: flex;
+  }
+  
+  .blocks-container {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .editable-block {
+    flex: 0 0 45%;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+  }
+  
+  .editor-panel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 300px;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  

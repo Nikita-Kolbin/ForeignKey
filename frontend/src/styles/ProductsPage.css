@@ -1,0 +1,153 @@
+.product-list-container {
+  width: 100%;
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1a1a1a;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  padding: 8px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.product-table {
+  width: 80%;
+  border-collapse: collapse;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+.product-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  text-align: left;
+}
+.product-table tr th {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.product-table tr:hover {
+  background-color: #f2f2f2;
+}
+
+.product-table tr:hover td {
+  background-color: #d9b3ff;
+}
+
+.product-details-button {
+  background-color: #4b0082;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  cursor: pointer;
+}
+
+.product-details-button:hover {
+  background-color: #800080;
+}
+
+.modal-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background-color: #fefefe;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  max-width: 80%;
+  overflow: auto;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.add-product-form input {
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px;
+  width: calc(100% - 22px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-product-form button {
+  background-color: #4b0082;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.add-product-form button:hover {
+  background-color: #800080;
+}
+
+.product-details-container {
+  margin-top: 20px;
+}
+
+.product-list {
+  margin-top: 20px;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.product-table th, .product-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.product-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.product-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.product-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}

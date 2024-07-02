@@ -1,0 +1,124 @@
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #9aadff 0%, #fad0c4 100%);
+  }
+  
+  .register-content {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .register-form {
+    background: #ffffff;
+    padding: 20px;
+    text-align: center;
+    width: 250px; /* Уменьшение ширины формы */
+  }
+  
+  .auth-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .auth-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .auth-link.active {
+    text-decoration: underline;
+  }
+  
+  .vk-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px;
+    background: #4a76a8;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px 0;
+  }
+  
+  .vk-button::before {
+    content: url('path/to/vk-icon.svg'); /* Замените 'path/to/vk-icon.svg' на путь к вашему значку VK */
+    margin-right: 8px;
+  }
+  
+  .separator {
+    margin: 10px 0;
+    color: #888888;
+  }
+  
+  .register-input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 0px;
+    border: none;
+    border-bottom: 1px solid black; /* Черная подчеркивающая линия */
+    background-color: white; /* Белый цвет фона */
+    color: #0056b3;
+    font-size: 1em;
+    caret-color: #0056b3
+  }
+  
+  .register-input:-webkit-autofill,
+  .register-input:-webkit-autofill:hover, 
+  .register-input:-webkit-autofill:focus, 
+  .register-input:-webkit-autofill:active {
+      -webkit-text-fill-color: #0056b3; /* Цвет текста при автозаполнении */
+      font-size: 1em; /* Размер текста */
+      transition: background-color 5000s ease-in-out 0s; /* Задержка для анимации фона */
+      caret-color: #0056b3; /* Цвет курсора */
+  }
+
+
+  .register-button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .register-button:hover {
+    background: #0056b3;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 10px;
+  }
+  
+  .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  }
+  
+  .side-image {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    .image-container {
+      display: none; /* Скрываем изображение на устройствах с шириной экрана до 768px */
+    }
+  }

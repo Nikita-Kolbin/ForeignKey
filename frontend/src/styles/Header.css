@@ -1,0 +1,86 @@
+/* src/styles/Header.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #FFD74B;
+  color: #10101E;
+  height: 15vh;
+  padding: 0px 50px;
+}
+
+.logo a {
+  font-size: 2em;
+  font-weight: 500;
+  color: #10101E;
+  text-decoration: none;
+}
+
+.logo a:hover {
+  color: #5A57FF;
+}
+
+.login-container-button {
+  display: flex;
+  align-items: center;
+}
+
+/* ... существующий CSS ... */
+
+/* Добавим анимацию на кнопку входа */
+.login-button {
+  background-color: #FFD74B;
+  color: #10101E;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 2em;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.login-button:hover {
+  color: #5A57FF;
+  transform: scale(1.05);
+}
+
+/* ... существующий CSS ... */
+
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .header {
+      flex-direction: column;
+      height: auto;
+      padding: 10px 20px;
+  }
+
+  .logo a {
+      font-size: 1.5em;
+  }
+
+  .login-button {
+      font-size: 1.5em;
+      padding: 8px 16px;
+      margin-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+      flex-direction: column;
+      height: auto;
+      padding: 10px;
+  }
+
+  .logo a {
+      font-size: 1.2em;
+  }
+
+  .login-button {
+      font-size: 1.2em;
+      padding: 5px 10px;
+      margin-top: 5px;
+  }
+}
