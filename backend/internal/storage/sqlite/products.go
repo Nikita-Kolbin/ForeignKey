@@ -17,6 +17,7 @@ func (s *Storage) initProducts() error {
 		price INTEGER,
 		images_id TEXT,
 		active INTEGER,
+		tags TEXT DEFAULT '',
 	    FOREIGN KEY (website_id) REFERENCES websites (id)
 	);
 	`
@@ -29,17 +30,35 @@ func (s *Storage) initProducts() error {
 	return nil
 }
 
-func (s *Storage) CreateProduct(name, description, imagesId string, websiteId, price int) error {
+func (s *Storage) CreateProduct(name, description, imagesId, tags string, websiteId, price int) error {
 	const op = "storage.sqlite.CreateProduct"
 
 	if err := validateImagesId(imagesId); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	q := `INSERT INTO products (website_id, name, description, price, images_id, active) 
-		  VALUES (?, ?, ?, ?, ?, 1)`
+	q := `INSERT INTO products (website_id, name, description, price, images_id, active, tags) 
+		  VALUES (?, ?, ?, ?, ?, 1, ?)`
 
-	_, err := s.db.Exec(q, websiteId, name, description, price, imagesId)
+	_, err := s.db.Exec(q, websiteId, name, description, price, imagesId, tags)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) UpdateProduct(name, description, imagesId, tags string, id, price int) error {
+	const op = "storage.sqlite.UpdateProduct"
+
+	if err := validateImagesId(imagesId); err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	q := `UPDATE products SET name=?, description=?, price=?, images_id=?, tags=?
+		  WHERE id=?`
+
+	_, err := s.db.Exec(q, name, description, price, imagesId, tags, id)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -50,7 +69,7 @@ func (s *Storage) CreateProduct(name, description, imagesId string, websiteId, p
 func (s *Storage) GetActiveProducts(websiteId int) ([]storage.ProductInfo, error) {
 	const op = "storage.sqlite.GetActiveProducts"
 
-	q := `SELECT id, name, description, price, images_id FROM products 
+	q := `SELECT id, name, description, price, images_id, tags FROM products 
           WHERE website_id=? AND active=1`
 
 	rows, err := s.db.Query(q, websiteId)
@@ -60,10 +79,10 @@ func (s *Storage) GetActiveProducts(websiteId int) ([]storage.ProductInfo, error
 
 	res := make([]storage.ProductInfo, 0)
 
-	var name, description, imagesId string
+	var name, description, imagesId, tags string
 	var id, price int
 	for rows.Next() {
-		if err = rows.Scan(&id, &name, &description, &price, &imagesId); err != nil {
+		if err = rows.Scan(&id, &name, &description, &price, &imagesId, &tags); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		p := storage.ProductInfo{
@@ -74,6 +93,7 @@ func (s *Storage) GetActiveProducts(websiteId int) ([]storage.ProductInfo, error
 			Price:       price,
 			ImagesId:    imagesId,
 			Active:      1,
+			Tags:        tags,
 		}
 		res = append(res, p)
 	}
@@ -84,7 +104,7 @@ func (s *Storage) GetActiveProducts(websiteId int) ([]storage.ProductInfo, error
 func (s *Storage) GetAllProducts(websiteId int) ([]storage.ProductInfo, error) {
 	const op = "storage.sqlite.GetAllProducts"
 
-	q := `SELECT id, name, description, price, images_id, active FROM products WHERE website_id=?`
+	q := `SELECT id, name, description, price, images_id, active, tags FROM products WHERE website_id=?`
 
 	rows, err := s.db.Query(q, websiteId)
 	if err != nil {
@@ -93,10 +113,10 @@ func (s *Storage) GetAllProducts(websiteId int) ([]storage.ProductInfo, error) {
 
 	res := make([]storage.ProductInfo, 0)
 
-	var name, description, imagesId string
+	var name, description, imagesId, tags string
 	var id, price, active int
 	for rows.Next() {
-		if err = rows.Scan(&id, &name, &description, &price, &imagesId, &active); err != nil {
+		if err = rows.Scan(&id, &name, &description, &price, &imagesId, &active, &tags); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		p := storage.ProductInfo{
@@ -107,6 +127,7 @@ func (s *Storage) GetAllProducts(websiteId int) ([]storage.ProductInfo, error) {
 			Price:       price,
 			ImagesId:    imagesId,
 			Active:      active,
+			Tags:        tags,
 		}
 		res = append(res, p)
 	}
@@ -117,13 +138,13 @@ func (s *Storage) GetAllProducts(websiteId int) ([]storage.ProductInfo, error) {
 func (s *Storage) GetProduct(productId int) (*storage.ProductInfo, error) {
 	const op = "storage.sqlite.GetProduct"
 
-	q := `SELECT id, website_id, name, description, price, images_id, active  FROM products WHERE id=?`
+	q := `SELECT id, website_id, name, description, price, images_id, active, tags FROM products WHERE id=?`
 
 	row := s.db.QueryRow(q, productId)
 
-	var name, description, imagesId string
+	var name, description, imagesId, tags string
 	var id, websiteId, price, active int
-	if err := row.Scan(&id, &websiteId, &name, &description, &price, &imagesId, &active); err != nil {
+	if err := row.Scan(&id, &websiteId, &name, &description, &price, &imagesId, &active, &tags); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	p := storage.ProductInfo{
@@ -134,6 +155,7 @@ func (s *Storage) GetProduct(productId int) (*storage.ProductInfo, error) {
 		Price:       price,
 		ImagesId:    imagesId,
 		Active:      active,
+		Tags:        tags,
 	}
 
 	return &p, nil

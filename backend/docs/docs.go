@@ -770,6 +770,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/product/update": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Update product info",
+                "parameters": [
+                    {
+                        "description": "new profile data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/product.UpdateProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/website/aliases": {
             "get": {
                 "security": [
@@ -1229,6 +1267,29 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "integer"
+                },
+                "tags": {
+                    "type": "string"
+                }
+            }
+        },
+        "product.ProductsInfo": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "images_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "string"
                 }
             }
         },
@@ -1243,6 +1304,17 @@ const docTemplate = `{
                 },
                 "product_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "product.UpdateProductRequest": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "product_info": {
+                    "$ref": "#/definitions/product.ProductsInfo"
                 }
             }
         },
@@ -1398,6 +1470,9 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "integer"
+                },
+                "tags": {
+                    "type": "string"
                 },
                 "website_id": {
                     "type": "integer"

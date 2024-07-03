@@ -49,6 +49,7 @@ type ProductInfo struct {
 	Price       int    `json:"price"`
 	ImagesId    string `json:"images_id"`
 	Active      int    `json:"active"`
+	Tags        string `json:"tags"`
 }
 
 type CartItem struct {

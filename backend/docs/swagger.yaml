@@ -191,6 +191,21 @@ definitions:
         type: string
       price:
         type: integer
+      tags:
+        type: string
+    type: object
+  product.ProductsInfo:
+    properties:
+      description:
+        type: string
+      images_id:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      tags:
+        type: string
     type: object
   product.UpdateActiveRequest:
     properties:
@@ -200,6 +215,13 @@ definitions:
         type: string
       product_id:
         type: integer
+    type: object
+  product.UpdateProductRequest:
+    properties:
+      product_id:
+        type: integer
+      product_info:
+        $ref: '#/definitions/product.ProductsInfo'
     type: object
   response.Response:
     properties:
@@ -301,6 +323,8 @@ definitions:
         type: string
       price:
         type: integer
+      tags:
+        type: string
       website_id:
         type: integer
     type: object
@@ -812,6 +836,29 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Change product active status
+      tags:
+      - product
+  /product/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: new profile data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/product.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update product info
       tags:
       - product
   /website/aliases:
