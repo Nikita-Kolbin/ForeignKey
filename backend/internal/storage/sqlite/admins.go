@@ -19,6 +19,7 @@ func (s *Storage) initAdmins() error {
 		last_name TEXT DEFAULT '',
 		father_name TEXT DEFAULT '',
 		city TEXT DEFAULT '',
+		telegram TEXT DEFAULT '',
 		image_id INTEGER DEFAULT 0
 	);
 	`
@@ -76,30 +77,37 @@ func (s *Storage) GetAdminId(email, password string) (int, error) {
 func (s *Storage) GetAdminById(id int) (*storage.Admin, error) {
 	const op = "storage.sqlite.GetAdminById"
 
-	q := `SELECT email, first_name, last_name, father_name, city, image_id
+	q := `SELECT email, first_name, last_name, father_name, city, telegram, image_id
 		  FROM admins WHERE id=?`
 
 	row := s.db.QueryRow(q, id)
 
 	var ii int
-	var e, fn, ln, fan, c string
-	if err := row.Scan(&e, &fn, &ln, &fan, &c, &ii); err != nil {
+	var e, fn, ln, fan, tg, c string
+	if err := row.Scan(&e, &fn, &ln, &fan, &c, &tg, &ii); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &storage.Admin{
-		Id: id, Email: e, FirstName: fn, LastName: ln, FatherName: fan, City: c, ImageId: ii,
+		Id:         id,
+		Email:      e,
+		FirstName:  fn,
+		LastName:   ln,
+		FatherName: fan,
+		City:       c,
+		Telegram:   tg,
+		ImageId:    ii,
 	}, nil
 }
 
-func (s *Storage) UpdateAdminProfile(fin, ln, fan, city string, id, ii int) error {
+func (s *Storage) UpdateAdminProfile(fin, ln, fan, city, tg string, id, ii int) error {
 	const op = "storage.sqlite.UpdateAdminProfile"
 
 	q := `UPDATE admins
-		  SET first_name=?, last_name=?, father_name=?, city=?, image_id=?
+		  SET first_name=?, last_name=?, father_name=?, city=?, telegram=?, image_id=?
     	  WHERE id=?`
 
-	_, err := s.db.Exec(q, fin, ln, fan, city, ii, id)
+	_, err := s.db.Exec(q, fin, ln, fan, city, tg, ii, id)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

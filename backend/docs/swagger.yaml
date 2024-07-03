@@ -44,6 +44,8 @@ definitions:
         type: integer
       last_name:
         type: string
+      telegram:
+        type: string
     type: object
   cart.AddRequest:
     properties:
@@ -221,6 +223,8 @@ definitions:
       image_id:
         type: integer
       last_name:
+        type: string
+      telegram:
         type: string
     type: object
   storage.CartItem:

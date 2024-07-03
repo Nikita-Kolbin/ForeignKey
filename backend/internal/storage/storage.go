@@ -24,6 +24,7 @@ type Admin struct {
 	LastName   string `json:"last_name"`
 	FatherName string `json:"father_name"`
 	City       string `json:"city"`
+	Telegram   string `json:"telegram"`
 	ImageId    int    `json:"image_id"`
 }
 

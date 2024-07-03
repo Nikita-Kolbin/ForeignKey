@@ -12,7 +12,7 @@ import (
 )
 
 type ProfileUpdater interface {
-	UpdateAdminProfile(fin, ln, fan, city string, id, ii int) error
+	UpdateAdminProfile(fin, ln, fan, city, tg string, id, ii int) error
 }
 
 type UpdateProfileRequest struct {
@@ -20,6 +20,7 @@ type UpdateProfileRequest struct {
 	LastName   string `json:"last_name"`
 	FatherName string `json:"father_name"`
 	City       string `json:"city"`
+	Telegram   string `json:"telegram"`
 	ImageId    int    `json:"image_id"`
 }
 
@@ -80,7 +81,15 @@ func NewUpdateProfile(pu ProfileUpdater, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = pu.UpdateAdminProfile(req.FirstName, req.LastName, req.FatherName, req.City, id, req.ImageId)
+		err = pu.UpdateAdminProfile(
+			req.FirstName,
+			req.LastName,
+			req.FatherName,
+			req.City,
+			req.Telegram,
+			id,
+			req.ImageId,
+		)
 		if err != nil {
 			log.Error("failed update profile", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)

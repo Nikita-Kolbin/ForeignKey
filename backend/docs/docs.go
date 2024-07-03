@@ -1001,6 +1001,9 @@ const docTemplate = `{
                 },
                 "last_name": {
                     "type": "string"
+                },
+                "telegram": {
+                    "type": "string"
                 }
             }
         },
@@ -1276,6 +1279,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "telegram": {
                     "type": "string"
                 }
             }

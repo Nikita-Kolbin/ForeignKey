@@ -994,6 +994,9 @@
                 },
                 "last_name": {
                     "type": "string"
+                },
+                "telegram": {
+                    "type": "string"
                 }
             }
         },
@@ -1269,6 +1272,9 @@
                     "type": "integer"
                 },
                 "last_name": {
+                    "type": "string"
+                },
+                "telegram": {
                     "type": "string"
                 }
             }
