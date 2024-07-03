@@ -18,5 +18,15 @@ services:
     depends_on:
      - backend
 
+  tg-bot:
+    build: ./tg-bot
+    ports:
+      - 8083:8083
+    networks:
+      - foreign_key_nw
+    command: ./build
+    depends_on:
+      - backend
+
 networks:
   foreign_key_nw: { }
