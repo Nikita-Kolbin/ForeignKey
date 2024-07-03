@@ -28,9 +28,16 @@ type Admin struct {
 }
 
 type Customer struct {
-	Id        int    `json:"id"`
-	WebsiteId int    `json:"website_id"`
-	Email     string `json:"email"`
+	Id           int    `json:"id"`
+	WebsiteId    int    `json:"website_id"`
+	Email        string `json:"email"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	FatherName   string `json:"father_name"`
+	Phone        string `json:"phone"`
+	Telegram     string `json:"telegram"`
+	DeliveryType string `json:"delivery_type"`
+	PaymentType  string `json:"payment_type"`
 }
 
 type ProductInfo struct {

@@ -14,6 +14,7 @@ func (s *Storage) initAdmins() error {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		email TEXT UNIQUE,
 		password_hash TEXT,
+		
 		first_name TEXT DEFAULT '',
 		last_name TEXT DEFAULT '',
 		father_name TEXT DEFAULT '',

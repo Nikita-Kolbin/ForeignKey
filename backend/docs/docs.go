@@ -278,6 +278,30 @@ const docTemplate = `{
                 }
             }
         },
+        "/customer/get-profile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Get customer profile",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/customer.GetProfileResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/customer/sign-in": {
             "post": {
                 "consumes": [
@@ -339,6 +363,44 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/customer.TokenResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/update-profile": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Update customer profile",
+                "parameters": [
+                    {
+                        "description": "new profile data",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customer.UpdateProfileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -981,6 +1043,20 @@ const docTemplate = `{
                 }
             }
         },
+        "customer.GetProfileResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/storage.Customer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "customer.GetResponse": {
             "type": "object",
             "properties": {
@@ -1036,6 +1112,32 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "customer.UpdateProfileRequest": {
+            "type": "object",
+            "properties": {
+                "delivery_type": {
+                    "type": "string"
+                },
+                "father_name": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "telegram": {
                     "type": "string"
                 }
             }
@@ -1198,11 +1300,32 @@ const docTemplate = `{
         "storage.Customer": {
             "type": "object",
             "properties": {
+                "delivery_type": {
+                    "type": "string"
+                },
                 "email": {
+                    "type": "string"
+                },
+                "father_name": {
+                    "type": "string"
+                },
+                "first_name": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "payment_type": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "telegram": {
+                    "type": "string"
                 },
                 "website_id": {
                     "type": "integer"

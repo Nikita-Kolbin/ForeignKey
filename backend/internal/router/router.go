@@ -58,6 +58,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Post("/api/customer/sign-up", customer.NewSignUp(storage, log))
 	router.Post("/api/customer/sign-in", customer.NewSignIn(storage, log))
 	router.Get("/api/customer/get-by-alias/{alias}", customer.NewGetByAlias(storage, log))
+	router.Get("/api/customer/get-profile", customer.NewGetProfile(storage, log))
+	router.Put("/api/customer/update-profile", customer.NewUpdateProfile(storage, log))
 
 	router.Post("/api/cart/add", cart.NewAdd(storage, log))
 	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))

@@ -70,6 +70,15 @@ definitions:
       status:
         type: string
     type: object
+  customer.GetProfileResponse:
+    properties:
+      error:
+        type: string
+      profile:
+        $ref: '#/definitions/storage.Customer'
+      status:
+        type: string
+    type: object
   customer.GetResponse:
     properties:
       customers:
@@ -106,6 +115,23 @@ definitions:
       status:
         type: string
       token:
+        type: string
+    type: object
+  customer.UpdateProfileRequest:
+    properties:
+      delivery_type:
+        type: string
+      father_name:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      payment_type:
+        type: string
+      phone:
+        type: string
+      telegram:
         type: string
     type: object
   image.UploadResponse:
@@ -210,10 +236,24 @@ definitions:
     type: object
   storage.Customer:
     properties:
+      delivery_type:
+        type: string
       email:
+        type: string
+      father_name:
+        type: string
+      first_name:
         type: string
       id:
         type: integer
+      last_name:
+        type: string
+      payment_type:
+        type: string
+      phone:
+        type: string
+      telegram:
+        type: string
       website_id:
         type: integer
     type: object
@@ -464,6 +504,20 @@ paths:
       summary: Get all customers by alias
       tags:
       - customer
+  /customer/get-profile:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/customer.GetProfileResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get customer profile
+      tags:
+      - customer
   /customer/sign-in:
     post:
       consumes:
@@ -504,6 +558,29 @@ paths:
           schema:
             $ref: '#/definitions/customer.TokenResponse'
       summary: SingUp customer
+      tags:
+      - customer
+  /customer/update-profile:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: new profile data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/customer.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update customer profile
       tags:
       - customer
   /image/download/{id}:

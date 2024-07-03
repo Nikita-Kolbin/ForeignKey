@@ -2,48 +2,44 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"time"
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-required:"true"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	StorageName string `yaml:"storage_name" env-required:"true"`
-	ImagesPath  string `yaml:"images_path" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
-	Email       `yaml:"email"`
+	Env         string `env:"ENV" env-required:"true"`
+	StoragePath string `env:"STORAGE_PATH" env-required:"true"`
+	StorageName string `env:"STORAGE_NAME" env-required:"true"`
+	ImagesPath  string `env:"IMAGES_PATH" env-required:"true"`
+	HTTPServer
+	Email
 }
 
 type HTTPServer struct {
-	Address     string        `yaml:"address" env-default:"localhost:8082"`
-	Timeout     time.Duration `yaml:"timeout" env-default:"10s"`
-	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
+	Address     string        `env:"SERVER_ADDRESS" env-default:"localhost:8082"`
+	Timeout     time.Duration `env:"SERVER_TIMEOUT" env-default:"10s"`
+	IdleTimeout time.Duration `env:"SERVER_IDLE_TIMEOUT" env-default:"60s"`
 }
 
 type Email struct {
-	EmailAddress string `yaml:"email_address"`
-	Password     string `yaml:"password"`
-	SmtpHost     string `yaml:"smtp_host"`
-	SmtpPort     string `yaml:"smtp_port"`
+	EmailAddress string `env:"EMAIL_ADDRESS"`
+	Password     string `env:"EMAIL_PASSWORD"`
+	SmtpHost     string `env:"SMTP_HOST"`
+	SmtpPort     string `env:"SMTP_PORT"`
 }
 
-func MustLoad() *Config {
-	//configPath := os.Getenv("CONFIG_PATH")
-	//if configPath == "" {
-	//	log.Fatal("CONFIG_PATH is not set")
-	//}
-
-	configPath := "./config/local.yaml"
-
-	// check file exists
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatalf("connfig file does not exist: %s", configPath)
+func MustLoad(dotenvPath string) *Config {
+	if os.Getenv("IN_DOCKER") == "" {
+		err := godotenv.Load(dotenvPath)
+		if err != nil {
+			log.Fatalf("can't load dotenv: %s", err)
+		}
 	}
 
 	var cfg Config
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		log.Fatalf("can't read config: %s", err)
 	}
 

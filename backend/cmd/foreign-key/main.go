@@ -17,6 +17,8 @@ import (
 	l "log"
 )
 
+const dotenvPath = "./backend/config/local.env"
+
 // @title           ForeignKey
 // @version         1.0
 
@@ -29,7 +31,7 @@ import (
 
 func main() {
 	// config
-	cfg := config.MustLoad()
+	cfg := config.MustLoad(dotenvPath)
 
 	// logger
 	log, err := logger.SetupLogger(cfg.Env)

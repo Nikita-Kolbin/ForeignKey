@@ -14,7 +14,16 @@ func (s *Storage) initCustomers() error {
 		website_id INTEGER,
 		email TEXT,
 		password_hash TEXT,
-	    FOREIGN KEY (website_id) REFERENCES website (id)
+		
+		first_name TEXT DEFAULT '',
+		last_name TEXT DEFAULT '',
+		father_name TEXT DEFAULT '',
+		phone TEXT DEFAULT '',
+		telegram TEXT DEFAULT '',
+		delivery_type TEXT DEFAULT '',
+		payment_type TEXT DEFAULT '',
+		
+	    FOREIGN KEY (website_id) REFERENCES websites (id)
 	);
 	`
 
@@ -91,23 +100,38 @@ func (s *Storage) GetCustomerId(websiteId int, email, password string) (int, err
 func (s *Storage) GetCustomer(id int) (*storage.Customer, error) {
 	const op = "storage.sqlite.GetCustomer"
 
-	q := `SELECT website_id, email FROM customers WHERE id=?`
+	q := `SELECT website_id, email, first_name, last_name, father_name, phone, 
+		  telegram, delivery_type, payment_type FROM customers WHERE id=?`
 
 	row := s.db.QueryRow(q, id)
 
 	var websiteId int
-	var email string
-	if err := row.Scan(&websiteId, &email); err != nil {
+	var email, fin, ln, fan, ph, tg, dt, pt string
+	if err := row.Scan(&websiteId, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return &storage.Customer{Id: id, WebsiteId: websiteId, Email: email}, nil
+	customer := &storage.Customer{
+		Id:           id,
+		WebsiteId:    websiteId,
+		Email:        email,
+		FirstName:    fin,
+		LastName:     ln,
+		FatherName:   fan,
+		Phone:        ph,
+		Telegram:     tg,
+		DeliveryType: dt,
+		PaymentType:  pt,
+	}
+
+	return customer, nil
 }
 
 func (s *Storage) GetCustomersByWebsite(websiteId int) ([]storage.Customer, error) {
 	const op = "storage.sqlite.GetCustomersByWebsite"
 
-	q := `SELECT id, email FROM customers WHERE website_id=?;`
+	q := `SELECT id, email, first_name, last_name, father_name, phone, 
+		  telegram, delivery_type, payment_type FROM customers WHERE website_id=?;`
 
 	rows, err := s.db.Query(q, websiteId)
 	if err != nil {
@@ -117,23 +141,46 @@ func (s *Storage) GetCustomersByWebsite(websiteId int) ([]storage.Customer, erro
 	res := make([]storage.Customer, 0)
 
 	var id int
-	var email string
+	var email, fin, ln, fan, ph, tg, dt, pt string
 
 	for rows.Next() {
-		if err = rows.Scan(&id, &email); err != nil {
+		if err = rows.Scan(&id, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
 		c := storage.Customer{
-			Id:        id,
-			WebsiteId: websiteId,
-			Email:     email,
+			Id:           id,
+			WebsiteId:    websiteId,
+			Email:        email,
+			FirstName:    fin,
+			LastName:     ln,
+			FatherName:   fan,
+			Phone:        ph,
+			Telegram:     tg,
+			DeliveryType: dt,
+			PaymentType:  pt,
 		}
 
 		res = append(res, c)
 	}
 
 	return res, nil
+}
+
+func (s *Storage) UpdateCustomerProfile(fin, ln, fan, ph, tg, dt, pt string, id int) error {
+	const op = "storage.sqlite.UpdateAdminProfile"
+
+	q := `UPDATE customers
+		  SET first_name=?, last_name=?, father_name=?, phone=?, 
+		      telegram=?, delivery_type=?, payment_type=?
+    	  WHERE id=?`
+
+	_, err := s.db.Exec(q, fin, ln, fan, ph, tg, dt, pt, id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }
 
 func (s *Storage) CustomerIsExists(websiteId int, email string) (bool, error) {
