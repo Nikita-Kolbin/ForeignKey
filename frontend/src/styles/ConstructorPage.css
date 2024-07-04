@@ -1,0 +1,170 @@
+/* ConstructorPage.css */
+
+.constructor-page h2 {
+    color: #10101E;
+}
+
+.constructor-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-state, .website-container {
+    width: 80%;
+    height: 300px;
+    border: 2px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.add-website-button {
+    font-size: 50px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.add-website-button:hover .plus-icon {
+    color: green;
+}
+
+.website-card {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    background: url('/Фон-сайт.png') no-repeat center center;
+    background-size: cover;
+}
+
+.website-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.website-info {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
+    z-index: 2;
+}
+
+.website-info h3 {
+    font-size: 1.5em;
+}
+
+.website-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    position: absolute;
+    top: 10px;
+    padding: 0 10px;
+    z-index: 2;
+}
+
+.action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0px 5px;
+}
+
+.action-button img {
+    width: 50px;
+    height: 50px;
+}
+
+.edit-button {
+    left: 10px;
+}
+
+.delete-button {
+    right: 10px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow: hidden; /* Убираем прокрутку */
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.modal h3 {
+    color: #10101E;
+}
+
+.modal input {
+    width: 25vw;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.modal button {
+    margin: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.create-website-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+}
+
+.new-alias-input {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.confirm-delete-button {
+    background-color: red;
+    color: white;
+}
+
+.cancel-button {
+    background-color: grey;
+    color: white;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+}
