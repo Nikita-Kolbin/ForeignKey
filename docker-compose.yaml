@@ -2,6 +2,8 @@ services:
 
   backend:
     build: ./backend
+    env_file:
+      - backend/config/prod.env
     ports:
       - 8082:8082
     networks:
@@ -20,6 +22,8 @@ services:
 
   tg-bot:
     build: ./tg-bot
+    env_file:
+      - tg-bot/config/.env
     ports:
       - 8083:8083
     networks:

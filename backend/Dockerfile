@@ -4,7 +4,7 @@ WORKDIR /backend
 
 COPY . .
 
-ENV INDOCKER=1
+ENV IN_DOCKER=1
 
 RUN go mod tidy
 RUN go mod vendor
