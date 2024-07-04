@@ -1,4 +1,4 @@
-package admin
+package customer
 
 import (
 	"ForeignKey/internal/http-server/jwt_token"
@@ -12,30 +12,31 @@ import (
 )
 
 type ProfileUpdater interface {
-	UpdateAdminProfile(fin, ln, fan, city, tg string, id, ii int) error
+	UpdateCustomerProfile(fin, ln, fan, ph, tg, dt, pt string, id int) error
 }
 
 type UpdateProfileRequest struct {
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	FatherName string `json:"father_name"`
-	City       string `json:"city"`
-	Telegram   string `json:"telegram"`
-	ImageId    int    `json:"image_id"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	FatherName   string `json:"father_name"`
+	Phone        string `json:"phone"`
+	Telegram     string `json:"telegram"`
+	DeliveryType string `json:"delivery_type"`
+	PaymentType  string `json:"payment_type"`
 }
 
 // NewUpdateProfile godoc
-// @Summary Update admin profile
+// @Summary Update customer profile
 // @Security ApiKeyAuth
-// @Tags admin
+// @Tags customer
 // @Accept json
 // @Produce  json
 // @Param input body UpdateProfileRequest true "new profile data"
 // @Success 200 {object} response.Response
-// @Router /admin/update-profile [put]
+// @Router /customer/update-profile [put]
 func NewUpdateProfile(pu ProfileUpdater, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.admin.NewUpdateProfile"
+		const op = "handlers.customer.NewUpdateProfile"
 
 		log = log.With(
 			slog.String("op", op),
@@ -74,21 +75,22 @@ func NewUpdateProfile(pu ProfileUpdater, log *slog.Logger) http.HandlerFunc {
 			render.JSON(w, r, response.Error("invalid token"))
 			return
 		}
-		if role != jwt_token.RoleAdmin {
+		if role != jwt_token.RoleCustomer {
 			log.Info("permission denied", slog.String("role", role))
 			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("permission denied"))
 			return
 		}
 
-		err = pu.UpdateAdminProfile(
+		err = pu.UpdateCustomerProfile(
 			req.FirstName,
 			req.LastName,
 			req.FatherName,
-			req.City,
+			req.Phone,
 			req.Telegram,
+			req.DeliveryType,
+			req.PaymentType,
 			id,
-			req.ImageId,
 		)
 		if err != nil {
 			log.Error("failed update profile", slog.String("err", err.Error()))
@@ -97,7 +99,7 @@ func NewUpdateProfile(pu ProfileUpdater, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		log.Info("profile updated", slog.Int("admin id", id))
+		log.Info("profile updated", slog.Int("customer id", id))
 
 		render.JSON(w, r, response.OK())
 	}

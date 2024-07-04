@@ -14,7 +14,8 @@ import (
 
 type ActiveChanger interface {
 	SetProductActive(productId, active int) error
-	GetWebsite(alias string) (websiteId, adminId int, err error)
+	GetWebsiteById(id int) (adminId int, alias string, err error)
+	GetProduct(productId int) (*storage.ProductInfo, error)
 }
 
 type UpdateActiveRequest struct {
@@ -66,7 +67,7 @@ func NewSetActive(ac ActiveChanger, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, role, _, err := jwt_token.ParseToken(token)
+		idFromToken, role, _, err := jwt_token.ParseToken(token)
 		if err != nil {
 			log.Error("failed to parse token", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)
@@ -80,14 +81,28 @@ func NewSetActive(ac ActiveChanger, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		_, adminId, err := ac.GetWebsite(req.Alias)
+		product, err := ac.GetProduct(req.ProductId)
+		if err != nil {
+			log.Error("failed to get product", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("failed to find product"))
+			return
+		}
+
+		adminId, alias, err := ac.GetWebsiteById(product.WebsiteId)
 		if err != nil {
 			log.Error("failed to get website", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, response.Error("failed to find website"))
 			return
 		}
-		if adminId != id {
+		if alias != req.Alias {
+			log.Info("wrong alias", slog.String("alias", req.Alias))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("wrong alias"))
+			return
+		}
+		if adminId != idFromToken {
 			log.Info("admin is not owner", slog.String("alias", req.Alias))
 			render.Status(r, http.StatusForbidden)
 			render.JSON(w, r, response.Error("admin is not owner"))

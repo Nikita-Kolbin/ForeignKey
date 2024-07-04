@@ -1,0 +1,71 @@
+definitions:
+  api.Response:
+    properties:
+      error:
+        type: string
+      status:
+        type: string
+    type: object
+  api.SendEmailRequest:
+    properties:
+      message:
+        type: string
+      receiver_email:
+        type: string
+    type: object
+  api.SendTelegramRequest:
+    properties:
+      message:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8083
+info:
+  contact: {}
+  title: Notification
+  version: "1.0"
+paths:
+  /send-email:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.SendEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Send email
+      tags:
+      - notification
+  /send-telegram:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.SendTelegramRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Telegram email
+      tags:
+      - notification
+swagger: "2.0"
