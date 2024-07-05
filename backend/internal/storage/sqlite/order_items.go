@@ -11,10 +11,10 @@ func (s *Storage) initOrderItems() error {
 	CREATE TABLE IF NOT EXISTS order_items (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		order_id INTEGER,
-		product_id INTEGER,
+		saved_product_id INTEGER,
 		count INTEGER,
 	    FOREIGN KEY (order_id) REFERENCES orders (id),
-	    FOREIGN KEY (product_id) REFERENCES products (id)
+	    FOREIGN KEY (saved_product_id) REFERENCES saved_products (id)
 	);
 	`
 
@@ -29,11 +29,20 @@ func (s *Storage) initOrderItems() error {
 func (s *Storage) CreateOrderItem(tx *sql.Tx, orderId, productId, count int) error {
 	const op = "storage.sqlite.CreateOrderItem"
 
-	q := `INSERT INTO order_items (order_id, product_id, count) VALUES (?, ?, ?)`
-
-	_, err := tx.Exec(q, orderId, productId, count)
+	p, err := s.GetProduct(productId)
 	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
 
+	savedProductId, err := s.CreateSavedProduct(p, tx)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	q := `INSERT INTO order_items (order_id, saved_product_id, count) VALUES (?, ?, ?)`
+
+	_, err = tx.Exec(q, orderId, savedProductId, count)
+	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -43,7 +52,7 @@ func (s *Storage) CreateOrderItem(tx *sql.Tx, orderId, productId, count int) err
 func (s *Storage) GetOrderItems(orderId int) ([]storage.OrderItem, error) {
 	const op = "storage.sqlite.GetOrderItems"
 
-	q := `SELECT id, product_id, count FROM order_items WHERE order_id=?`
+	q := `SELECT id, saved_product_id, count FROM order_items WHERE order_id=?`
 
 	rows, err := s.db.Query(q, orderId)
 	if err != nil {
@@ -58,7 +67,7 @@ func (s *Storage) GetOrderItems(orderId int) ([]storage.OrderItem, error) {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
-		product, err := s.GetProduct(productId)
+		product, err := s.GetSavedProduct(productId)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}

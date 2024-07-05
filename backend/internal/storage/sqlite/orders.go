@@ -64,6 +64,10 @@ func (s *Storage) CreateOrder(customerId int, comment string) error {
 	}
 
 	for _, item := range cartItems {
+		if item.Product.Active == 0 {
+			continue
+		}
+
 		err = s.CreateOrderItem(tx, orderId, item.Product.Id, item.Count)
 		if err != nil {
 			return errWithRollback(tx, op, err)
