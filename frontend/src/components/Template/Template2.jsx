@@ -13,6 +13,11 @@ const Template2 = () => {
   const [showSignUp, setShowSignUp] = useState(false);
   const [customerLoggedIn, setCustomerLoggedIn] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [deliveryType, setDeliveryType] = useState('курьер');
+  const [fullName, setFullName] = useState('');
+  const [paymentType, setPaymentType] = useState('наличные');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [telegramName, setTelegramName] = useState('');
 
   useEffect(() => {
     const fetchStyles = async () => {
@@ -55,7 +60,7 @@ const Template2 = () => {
 
         if (response.ok && data.status === 'OK') {
           const items = data.cart_items
-            .filter(item => item.count > 0) // Фильтруем товары с количеством больше нуля
+            .filter(item => item.count > 0)
             .map(item => ({
               id: item.product.id,
               name: item.product.name,
@@ -63,7 +68,7 @@ const Template2 = () => {
               quantity: item.count
             }));
           setCartItems(items);
-          setCustomerLoggedIn(true); // Устанавливаем состояние входа в систему, если корзина успешно загружена
+          setCustomerLoggedIn(true);
         } else {
           console.error('Ошибка при получении товаров в корзине:', data.error);
         }
@@ -80,7 +85,7 @@ const Template2 = () => {
   const handleSignInSuccess = () => {
     setCustomerLoggedIn(true);
     setShowSignIn(false);
-    fetchCartItems(); // Загружаем корзину после успешного входа
+    fetchCartItems();
   };
 
   const handleSignUpSuccess = () => {
@@ -103,7 +108,7 @@ const Template2 = () => {
       const data = await response.json();
 
       if (response.ok && data.status === 'OK') {
-        fetchCartItems(); // Обновляем корзину после добавления товара
+        fetchCartItems();
       } else {
         console.error('Ошибка при добавлении товара в корзину:', data.error);
       }
@@ -127,7 +132,7 @@ const Template2 = () => {
       const data = await response.json();
 
       if (response.ok && data.status === 'OK') {
-        fetchCartItems(); // Обновляем корзину после изменения количества товара
+        fetchCartItems();
       } else {
         console.error('Ошибка при изменении количества товара в корзине:', data.error);
       }
@@ -144,28 +149,52 @@ const Template2 = () => {
   const handleMakeOrder = async () => {
     const token = localStorage.getItem('customerToken');
 
-    // Проверяем, что корзина не пуста
     if (cartItems.length === 0) {
       alert('Корзина пуста. Добавьте товары в корзину перед созданием заказа.');
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/order/make`, {
+      const profileResponse = await fetch(`${API_BASE_URL}/customer/update-profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          delivery_type: deliveryType,
+          father_name: fullName.split(' ')[2] || '',
+          first_name: fullName.split(' ')[1] || '',
+          last_name: fullName.split(' ')[0] || '',
+          payment_type: paymentType,
+          phone: phoneNumber,
+          telegram: telegramName
+        })
+      });
+
+      const profileData = await profileResponse.json();
+
+      if (!profileResponse.ok || profileData.status !== 'OK') {
+        console.error('Ошибка при обновлении профиля:', profileData.error);
+        alert(`Ошибка при обновлении профиля: ${profileData.error}`);
+        return;
+      }
+
+      const orderResponse = await fetch(`${API_BASE_URL}/order/make`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      const data = await response.json();
+      const orderData = await orderResponse.json();
 
-      if (response.ok && data.status === 'OK') {
-        setCartItems([]); // Обнуляем корзину после успешного создания заказа
+      if (orderResponse.ok && orderData.status === 'OK') {
+        setCartItems([]);
         alert('Заказ успешно создан');
       } else {
-        console.error('Ошибка при создании заказа:', data.error);
-        alert(`Ошибка при создании заказа: ${data.error}`);
+        console.error('Ошибка при создании заказа:', orderData.error);
+        alert(`Ошибка при создании заказа: ${orderData.error}`);
       }
     } catch (error) {
       console.error('Ошибка при создании заказа:', error);
@@ -196,8 +225,51 @@ const Template2 = () => {
         cartItems={cartItems} 
         onAdd={handleAddToCart} 
         onRemove={handleRemoveFromCart} 
-        onMakeOrder={handleMakeOrder} 
       />
+      {customerLoggedIn && (
+        <div>
+          <h2>Оформление заказа</h2>
+          <label>
+            Тип доставки:
+            <select value={deliveryType} onChange={(e) => setDeliveryType(e.target.value)}>
+              <option value="курьер">Курьер</option>
+              <option value="самовывоз">Самовывоз</option>
+            </select>
+          </label>
+          <label>
+            ФИО:
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </label>
+          <label>
+            Тип оплаты:
+            <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)}>
+              <option value="наличные">Наличные</option>
+              <option value="безнал">Безнал</option>
+            </select>
+          </label>
+          <label>
+            Номер телефона:
+            <input
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+          </label>
+          <label>
+            Имя в телеграмм:
+            <input
+              type="text"
+              value={telegramName}
+              onChange={(e) => setTelegramName(e.target.value)}
+            />
+          </label>
+          <button onClick={handleMakeOrder}>Сделать заказ</button>
+        </div>
+      )}
     </div>
   );
 };

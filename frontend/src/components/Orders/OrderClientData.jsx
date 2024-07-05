@@ -10,7 +10,7 @@ const OrderClientData = ({ clientData, orderDate }) => {
       <p>Доставка: {clientData.delivery}</p>
       <p>Телефон: {clientData.phone}</p>
       <p>Дата оформления заказа: {orderDate}</p>
-      <p>Комментарий: {clientData.comment}</p>
+      <p>Имя в телеграмм: {clientData.telegram}</p>
     </div>
   );
 };
