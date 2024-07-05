@@ -23,6 +23,9 @@ func (s *Storage) initCustomers() error {
 		delivery_type TEXT DEFAULT '',
 		payment_type TEXT DEFAULT '',
 		
+		email_notification INTEGER DEFAULT 0,
+		telegram_notification INTEGER DEFAULT 0,
+		
 	    FOREIGN KEY (website_id) REFERENCES websites (id)
 	);
 	`
@@ -101,27 +104,30 @@ func (s *Storage) GetCustomer(id int) (*storage.Customer, error) {
 	const op = "storage.sqlite.GetCustomer"
 
 	q := `SELECT website_id, email, first_name, last_name, father_name, phone, 
-		  telegram, delivery_type, payment_type FROM customers WHERE id=?`
+		  telegram, delivery_type, payment_type, email_notification, telegram_notification
+		  FROM customers WHERE id=?`
 
 	row := s.db.QueryRow(q, id)
 
-	var websiteId int
+	var websiteId, en, tgn int
 	var email, fin, ln, fan, ph, tg, dt, pt string
-	if err := row.Scan(&websiteId, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt); err != nil {
+	if err := row.Scan(&websiteId, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt, &en, &tgn); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	customer := &storage.Customer{
-		Id:           id,
-		WebsiteId:    websiteId,
-		Email:        email,
-		FirstName:    fin,
-		LastName:     ln,
-		FatherName:   fan,
-		Phone:        ph,
-		Telegram:     tg,
-		DeliveryType: dt,
-		PaymentType:  pt,
+		Id:                   id,
+		WebsiteId:            websiteId,
+		Email:                email,
+		FirstName:            fin,
+		LastName:             ln,
+		FatherName:           fan,
+		Phone:                ph,
+		Telegram:             tg,
+		DeliveryType:         dt,
+		PaymentType:          pt,
+		EmailNotification:    en,
+		TelegramNotification: tgn,
 	}
 
 	return customer, nil
@@ -131,7 +137,8 @@ func (s *Storage) GetCustomersByWebsite(websiteId int) ([]storage.Customer, erro
 	const op = "storage.sqlite.GetCustomersByWebsite"
 
 	q := `SELECT id, email, first_name, last_name, father_name, phone, 
-		  telegram, delivery_type, payment_type FROM customers WHERE website_id=?;`
+		  telegram, delivery_type, payment_type,  email_notification, telegram_notification
+		  FROM customers WHERE website_id=?;`
 
 	rows, err := s.db.Query(q, websiteId)
 	if err != nil {
@@ -140,25 +147,27 @@ func (s *Storage) GetCustomersByWebsite(websiteId int) ([]storage.Customer, erro
 
 	res := make([]storage.Customer, 0)
 
-	var id int
+	var id, en, tgn int
 	var email, fin, ln, fan, ph, tg, dt, pt string
 
 	for rows.Next() {
-		if err = rows.Scan(&id, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt); err != nil {
+		if err = rows.Scan(&id, &email, &fin, &ln, &fan, &ph, &tg, &dt, &pt, &en, &tgn); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
 		c := storage.Customer{
-			Id:           id,
-			WebsiteId:    websiteId,
-			Email:        email,
-			FirstName:    fin,
-			LastName:     ln,
-			FatherName:   fan,
-			Phone:        ph,
-			Telegram:     tg,
-			DeliveryType: dt,
-			PaymentType:  pt,
+			Id:                   id,
+			WebsiteId:            websiteId,
+			Email:                email,
+			FirstName:            fin,
+			LastName:             ln,
+			FatherName:           fan,
+			Phone:                ph,
+			Telegram:             tg,
+			DeliveryType:         dt,
+			PaymentType:          pt,
+			EmailNotification:    en,
+			TelegramNotification: tgn,
 		}
 
 		res = append(res, c)
@@ -196,4 +205,38 @@ func (s *Storage) CustomerIsExists(websiteId int, email string) (bool, error) {
 	}
 
 	return cnt > 0, nil
+}
+
+func (s *Storage) SetCustomerEmailNotification(customerId, notification int) error {
+	const op = "storage.sqlite.SetCustomerEmailNotification"
+
+	if notification != 0 && notification != 1 {
+		return storage.ErrInvalidNotification
+	}
+
+	q := `UPDATE customers SET email_notification=? WHERE id=?`
+
+	_, err := s.db.Exec(q, notification, customerId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) SetCustomerTelegramNotification(customerId, notification int) error {
+	const op = "storage.sqlite.SetCustomerTelegramNotification"
+
+	if notification != 0 && notification != 1 {
+		return storage.ErrInvalidNotification
+	}
+
+	q := `UPDATE customers SET telegram_notification=? WHERE id=?`
+
+	_, err := s.db.Exec(q, notification, customerId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }

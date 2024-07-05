@@ -3,13 +3,14 @@ package storage
 import "errors"
 
 var (
-	ErrEmailRegistered  = errors.New("email is already registered")
-	ErrAliasTaken       = errors.New("alias is already taken")
-	ErrEmptyOrder       = errors.New("order is empty")
-	ErrInvalidEmail     = errors.New("email is invalid")
-	ErrInvalidImagesIs  = errors.New("invalid images id")
-	ErrAdminHaveWebsite = errors.New("admin already have website")
-	ErrInvalidActive    = errors.New("invalid active status")
+	ErrEmailRegistered     = errors.New("email is already registered")
+	ErrAliasTaken          = errors.New("alias is already taken")
+	ErrEmptyOrder          = errors.New("order is empty")
+	ErrInvalidEmail        = errors.New("email is invalid")
+	ErrInvalidImagesIs     = errors.New("invalid images id")
+	ErrAdminHaveWebsite    = errors.New("admin already have website")
+	ErrInvalidActive       = errors.New("invalid active status")
+	ErrInvalidNotification = errors.New("invalid notification status")
 )
 
 const (
@@ -18,27 +19,31 @@ const (
 )
 
 type Admin struct {
-	Id         int    `json:"id"`
-	Email      string `json:"email"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	FatherName string `json:"father_name"`
-	City       string `json:"city"`
-	Telegram   string `json:"telegram"`
-	ImageId    int    `json:"image_id"`
+	Id                   int    `json:"id"`
+	Email                string `json:"email"`
+	FirstName            string `json:"first_name"`
+	LastName             string `json:"last_name"`
+	FatherName           string `json:"father_name"`
+	City                 string `json:"city"`
+	Telegram             string `json:"telegram"`
+	ImageId              int    `json:"image_id"`
+	TelegramNotification int    `json:"telegram_notification"`
+	EmailNotification    int    `json:"email_notification"`
 }
 
 type Customer struct {
-	Id           int    `json:"id"`
-	WebsiteId    int    `json:"website_id"`
-	Email        string `json:"email"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	FatherName   string `json:"father_name"`
-	Phone        string `json:"phone"`
-	Telegram     string `json:"telegram"`
-	DeliveryType string `json:"delivery_type"`
-	PaymentType  string `json:"payment_type"`
+	Id                   int    `json:"id"`
+	WebsiteId            int    `json:"website_id"`
+	Email                string `json:"email"`
+	FirstName            string `json:"first_name"`
+	LastName             string `json:"last_name"`
+	FatherName           string `json:"father_name"`
+	Phone                string `json:"phone"`
+	Telegram             string `json:"telegram"`
+	DeliveryType         string `json:"delivery_type"`
+	PaymentType          string `json:"payment_type"`
+	TelegramNotification int    `json:"telegram_notification"`
+	EmailNotification    int    `json:"email_notification"`
 }
 
 type ProductInfo struct {

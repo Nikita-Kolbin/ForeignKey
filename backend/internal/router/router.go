@@ -40,6 +40,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Post("/api/admin/sign-in", admin.NewSignIn(storage, log))
 	router.Get("/api/admin/get-profile", admin.NewGetProfile(storage, log))
 	router.Put("/api/admin/update-profile", admin.NewUpdateProfile(storage, log))
+	router.Patch("/api/admin/set-email-notification", admin.NewEmailNotification(storage, log))
+	router.Patch("/api/admin/set-telegram-notification", admin.NewTelegramNotification(storage, log))
 
 	router.Post("/api/image/upload", img.NewUpload(imageSaver, storage, log))
 	router.Get("/api/image/download/{id}", img.NewDownload(imageSaver, storage, log))
@@ -61,6 +63,8 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Get("/api/customer/get-by-alias/{alias}", customer.NewGetByAlias(storage, log))
 	router.Get("/api/customer/get-profile", customer.NewGetProfile(storage, log))
 	router.Put("/api/customer/update-profile", customer.NewUpdateProfile(storage, log))
+	router.Patch("/api/customer/set-email-notification", customer.NewEmailNotification(storage, log))
+	router.Patch("/api/customer/set-telegram-notification", customer.NewTelegramNotification(storage, log))
 
 	router.Post("/api/cart/add", cart.NewAdd(storage, log))
 	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))

@@ -32,6 +32,11 @@ definitions:
       token:
         type: string
     type: object
+  admin.UpdateEmailNotificationRequest:
+    properties:
+      notification:
+        type: integer
+    type: object
   admin.UpdateProfileRequest:
     properties:
       city:
@@ -46,6 +51,11 @@ definitions:
         type: string
       telegram:
         type: string
+    type: object
+  admin.UpdateTelegramNotificationRequest:
+    properties:
+      notification:
+        type: integer
     type: object
   cart.AddRequest:
     properties:
@@ -119,6 +129,11 @@ definitions:
       token:
         type: string
     type: object
+  customer.UpdateEmailNotificationRequest:
+    properties:
+      notification:
+        type: integer
+    type: object
   customer.UpdateProfileRequest:
     properties:
       delivery_type:
@@ -135,6 +150,11 @@ definitions:
         type: string
       telegram:
         type: string
+    type: object
+  customer.UpdateTelegramNotificationRequest:
+    properties:
+      notification:
+        type: integer
     type: object
   image.UploadResponse:
     properties:
@@ -384,6 +404,52 @@ paths:
       summary: Get admin profile
       tags:
       - admin
+  /admin/set-email-notification:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/admin.UpdateEmailNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change email notification status
+      tags:
+      - admin
+  /admin/set-telegram-notification:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/admin.UpdateTelegramNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change telegram notification status
+      tags:
+      - admin
   /admin/sign-in:
     post:
       consumes:
@@ -544,6 +610,52 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get customer profile
+      tags:
+      - customer
+  /customer/set-email-notification:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/customer.UpdateEmailNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change email notification status
+      tags:
+      - customer
+  /customer/set-telegram-notification:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: notification status
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/customer.UpdateTelegramNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Change telegram notification status
       tags:
       - customer
   /customer/sign-in:

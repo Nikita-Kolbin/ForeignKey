@@ -39,6 +39,82 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/set-email-notification": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Change email notification status",
+                "parameters": [
+                    {
+                        "description": "notification status",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.UpdateEmailNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/set-telegram-notification": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Change telegram notification status",
+                "parameters": [
+                    {
+                        "description": "notification status",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.UpdateTelegramNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/sign-in": {
             "post": {
                 "consumes": [
@@ -297,6 +373,82 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/customer.GetProfileResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/set-email-notification": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Change email notification status",
+                "parameters": [
+                    {
+                        "description": "notification status",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customer.UpdateEmailNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/customer/set-telegram-notification": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customer"
+                ],
+                "summary": "Change telegram notification status",
+                "parameters": [
+                    {
+                        "description": "notification status",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/customer.UpdateTelegramNotificationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -1022,6 +1174,14 @@ const docTemplate = `{
                 }
             }
         },
+        "admin.UpdateEmailNotificationRequest": {
+            "type": "object",
+            "properties": {
+                "notification": {
+                    "type": "integer"
+                }
+            }
+        },
         "admin.UpdateProfileRequest": {
             "type": "object",
             "properties": {
@@ -1042,6 +1202,14 @@ const docTemplate = `{
                 },
                 "telegram": {
                     "type": "string"
+                }
+            }
+        },
+        "admin.UpdateTelegramNotificationRequest": {
+            "type": "object",
+            "properties": {
+                "notification": {
+                    "type": "integer"
                 }
             }
         },
@@ -1157,6 +1325,14 @@ const docTemplate = `{
                 }
             }
         },
+        "customer.UpdateEmailNotificationRequest": {
+            "type": "object",
+            "properties": {
+                "notification": {
+                    "type": "integer"
+                }
+            }
+        },
         "customer.UpdateProfileRequest": {
             "type": "object",
             "properties": {
@@ -1180,6 +1356,14 @@ const docTemplate = `{
                 },
                 "telegram": {
                     "type": "string"
+                }
+            }
+        },
+        "customer.UpdateTelegramNotificationRequest": {
+            "type": "object",
+            "properties": {
+                "notification": {
+                    "type": "integer"
                 }
             }
         },

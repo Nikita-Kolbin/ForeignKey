@@ -20,7 +20,10 @@ func (s *Storage) initAdmins() error {
 		father_name TEXT DEFAULT '',
 		city TEXT DEFAULT '',
 		telegram TEXT DEFAULT '',
-		image_id INTEGER DEFAULT 0
+		image_id INTEGER DEFAULT 0,
+		
+		email_notification INTEGER DEFAULT 0,
+		telegram_notification INTEGER DEFAULT 0
 	);
 	`
 
@@ -77,26 +80,29 @@ func (s *Storage) GetAdminId(email, password string) (int, error) {
 func (s *Storage) GetAdminById(id int) (*storage.Admin, error) {
 	const op = "storage.sqlite.GetAdminById"
 
-	q := `SELECT email, first_name, last_name, father_name, city, telegram, image_id
+	q := `SELECT email, first_name, last_name, father_name, city, 
+          telegram, image_id, email_notification, telegram_notification
 		  FROM admins WHERE id=?`
 
 	row := s.db.QueryRow(q, id)
 
-	var ii int
+	var ii, en, tgn int
 	var e, fn, ln, fan, tg, c string
-	if err := row.Scan(&e, &fn, &ln, &fan, &c, &tg, &ii); err != nil {
+	if err := row.Scan(&e, &fn, &ln, &fan, &c, &tg, &ii, &en, &tgn); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &storage.Admin{
-		Id:         id,
-		Email:      e,
-		FirstName:  fn,
-		LastName:   ln,
-		FatherName: fan,
-		City:       c,
-		Telegram:   tg,
-		ImageId:    ii,
+		Id:                   id,
+		Email:                e,
+		FirstName:            fn,
+		LastName:             ln,
+		FatherName:           fan,
+		City:                 c,
+		Telegram:             tg,
+		ImageId:              ii,
+		EmailNotification:    en,
+		TelegramNotification: tgn,
 	}, nil
 }
 
@@ -108,6 +114,40 @@ func (s *Storage) UpdateAdminProfile(fin, ln, fan, city, tg string, id, ii int) 
     	  WHERE id=?`
 
 	_, err := s.db.Exec(q, fin, ln, fan, city, tg, ii, id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) SetAdminEmailNotification(adminId, notification int) error {
+	const op = "storage.sqlite.SetAdminEmailNotification"
+
+	if notification != 0 && notification != 1 {
+		return storage.ErrInvalidNotification
+	}
+
+	q := `UPDATE admins SET email_notification=? WHERE id=?`
+
+	_, err := s.db.Exec(q, notification, adminId)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (s *Storage) SetAdminTelegramNotification(adminId, notification int) error {
+	const op = "storage.sqlite.SetAdminTelegramNotification"
+
+	if notification != 0 && notification != 1 {
+		return storage.ErrInvalidNotification
+	}
+
+	q := `UPDATE admins SET telegram_notification=? WHERE id=?`
+
+	_, err := s.db.Exec(q, notification, adminId)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
