@@ -136,7 +136,7 @@ const OrdersPage = () => {
 
   const fetchClientData = async (customerId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/customer/profile/${customerId}`, {
+      const response = await fetch(`${API_BASE_URL}/customer/get-by-alias/${alias}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -146,14 +146,21 @@ const OrdersPage = () => {
       const data = await response.json();
 
       if (response.ok && data.status === 'OK') {
-        return {
-          fullName: data.customer.fullName,
-          email: data.customer.email,
-          paymentMethod: data.customer.paymentMethod,
-          delivery: data.customer.delivery,
-          phone: data.customer.phone,
-          comment: data.customer.comment
-        };
+        const customer = data.customers.find(customer => customer.id === customerId);
+        if (customer) {
+          return {
+            fullName: `${customer.last_name} ${customer.first_name} ${customer.father_name}`,
+            email: customer.email,
+            paymentMethod: customer.payment_type,
+            delivery: customer.delivery_type,
+            phone: customer.phone,
+            telegram: customer.telegram,
+            website_id: customer.website_id
+          };
+        } else {
+          console.error('Клиент не найден');
+          return {};
+        }
       } else {
         console.error('Ошибка при получении данных клиента:', data.error);
         return {};

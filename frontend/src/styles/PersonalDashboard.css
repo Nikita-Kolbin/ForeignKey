@@ -148,8 +148,8 @@
 
 .image-upload-container input[type="file"] {
   opacity: 0;
-  width: 100%;
-  height: 100%;
+  width: 100px;
+  height: 100px;
   cursor: pointer;
   position: absolute;
   top: 0;
@@ -160,6 +160,12 @@
   text-align: center;
   font-size: 1em;
   color: #007bff;
+}
+
+.image-upload-container .uploaded-image{
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
 .info-section {

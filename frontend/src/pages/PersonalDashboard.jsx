@@ -7,13 +7,14 @@ import { API_BASE_URL } from '../components/ApiConfig';
 import '../styles/PersonalDashboard.css';
 
 const PersonalDashboard = () => {
+  const defaultPhoto = '/Профиль.jpg';
   const [userData, setUserData] = useState({
     first_name: 'John',
     last_name: 'Doe',
     father_name: 'Smith',
     city: 'Example City',
     image_id: null,
-    photo: 'https://via.placeholder.com/150',
+    photo: defaultPhoto,
   });
   const [editMode, setEditMode] = useState(false);
 
@@ -29,7 +30,12 @@ const PersonalDashboard = () => {
 
         const result = await response.json();
         if (result.status === 'OK' && result.profile) {
-          setUserData(result.profile);
+          const profile = {
+            ...userData, // сохранение текущих значений, чтобы не перезаписывались поля, которые не были возвращены API
+            ...result.profile,
+            photo: result.profile.image_id ? defaultPhoto : result.profile.photo,
+          };
+
           if (result.profile.image_id) {
             const imageResponse = await fetch(`${API_BASE_URL}/image/download/${result.profile.image_id}`, {
               method: 'GET',
@@ -37,14 +43,16 @@ const PersonalDashboard = () => {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
               }
             });
+
             if (imageResponse.ok) {
               const imageBlob = await imageResponse.blob();
               const imageUrl = URL.createObjectURL(imageBlob);
-              setUserData(prevData => ({ ...prevData, photo: imageUrl }));
+              profile.photo = imageUrl;
             } else {
               console.error('Ошибка загрузки изображения');
             }
           }
+          setUserData(profile);
         } else {
           console.error('Ошибка получения профиля', result.error);
         }
@@ -62,48 +70,48 @@ const PersonalDashboard = () => {
   };
 
   return (
-      <div>
-        <NavigationControlPanel />
-        <div className="personal-dashboard">
-          <div className="top-section">
-            <div className="dashboard-section personal-info">
-              {editMode ? (
-                <EditProfileForm userData={userData} onSaveChanges={handleSaveChanges} />
-              ) : (
-                <div className="user-info">
-                  <div>
-                    <img src={userData.photo} alt="User" className="profile-photo" />
+    <div>
+      <NavigationControlPanel />
+      <div className="personal-dashboard">
+        <div className="top-section">
+          <div className="dashboard-section personal-info">
+            {editMode ? (
+              <EditProfileForm userData={userData} onSaveChanges={handleSaveChanges} />
+            ) : (
+              <div className="user-info">
+                <div>
+                  <img src={userData.photo || defaultPhoto} alt="User" className="profile-photo" />
+                </div>
+                <div className="info-section">
+                  <div className="profile-header">
+                    <h3>Персональная информация</h3>
+                    <button onClick={() => setEditMode(true)} className="edit-button">
+                      <img src="/Изменить.png" alt="Edit" className="edit-icon" />
+                    </button>
                   </div>
-                  <div className="info-section">
-                    <div className="profile-header">
-                      <h3>Персональная информация</h3>
-                      <button onClick={() => setEditMode(true)} className="edit-button">
-                        <img src="/public/Изменить.png" alt="Edit" className="edit-icon" />
-                      </button>
+                  <div className="personal-info">
+                    <div>
+                      <p>Имя: {userData.first_name}</p>
+                      <p>Фамилия: {userData.last_name}</p>
                     </div>
-                    <div className="personal-info">
-                      <div>
-                        <p>Имя: {userData.first_name}</p>
-                        <p>Фамилия: {userData.last_name}</p>
-                      </div>
-                      <div>
-                        <p>Отчество: {userData.father_name}</p>
-                        <p>Город: {userData.city}</p>
-                      </div>
+                    <div>
+                      <p>Отчество: {userData.father_name}</p>
+                      <p>Город: {userData.city}</p>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
-            <div className="dashboard-section message-sender">
-              <MessageSender />
-            </div>
+              </div>
+            )}
           </div>
-          <div className="dashboard-section chart-section">
-            <Chart />
+          <div className="dashboard-section message-sender">
+            <MessageSender />
           </div>
         </div>
+        <div className="dashboard-section chart-section">
+          <Chart />
+        </div>
       </div>
+    </div>
   );
 };
 

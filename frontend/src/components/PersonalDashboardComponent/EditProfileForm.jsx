@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../ApiConfig'; // Импортируйте базовый URL
 
 const EditProfileForm = ({ userData, onSaveChanges }) => {
   const [editedData, setEditedData] = useState(userData);
-  const [selectedImageId, setSelectedImageId] = useState(null);
+  const [selectedImageId, setSelectedImageId] = useState(userData.image_id || null);
+  const [imageSrc, setImageSrc] = useState(null);
+
+  useEffect(() => {
+    if (selectedImageId) {
+      fetchImage(selectedImageId);
+    }
+  }, [selectedImageId]);
+
+  const fetchImage = async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/image/download/${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Добавьте токен авторизации
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } else {
+        const result = await response.json();
+        console.error('Ошибка получения изображения', result.error);
+      }
+    } catch (error) {
+      console.error('Ошибка получения изображения', error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +60,7 @@ const EditProfileForm = ({ userData, onSaveChanges }) => {
           if (result.id) {
             setSelectedImageId(result.id);
             setEditedData({ ...editedData, image_id: result.id });
+            fetchImage(result.id);
           } else {
             console.error('Ошибка загрузки изображения', result.error);
           }
@@ -75,8 +105,12 @@ const EditProfileForm = ({ userData, onSaveChanges }) => {
         <label className="image-upload-label">
           Изображение:
           <div className="image-upload-container">
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-            <span>Вставьте изображение</span>
+            <input type="file" accept="image/*" onChange={handleImageChange}  class="view-image"/>
+            {imageSrc ? (
+              <img src={imageSrc} alt="Загруженное изображение" className="uploaded-image" />
+            ) : (
+              <span>Вставьте изображение</span>
+            )}
           </div>
         </label>
       </div>
