@@ -7,17 +7,21 @@ import (
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	"io"
 	"log/slog"
 	"net/http"
 )
 
 type OrdersMaker interface {
-	CreateOrder(customerId int) error
+	CreateOrder(customerId int, comment string) error
 	GetCustomer(id int) (*storage.Customer, error)
 }
 
 type EmailSender interface {
 	Send(receiverEmail, msg string) error
+}
+type MakeOrderRequest struct {
+	Comment string `json:"comment"`
 }
 
 // NewMakeOrder godoc
@@ -26,6 +30,7 @@ type EmailSender interface {
 // @Security ApiKeyAuth
 // @Tags order
 // @Produce json
+// @Param input body MakeOrderRequest true "comment to order"
 // @Success 200 {object} response.Response
 // @Router /order/make [post]
 func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.HandlerFunc {
@@ -36,6 +41,22 @@ func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.Handler
 			slog.String("op", op),
 			slog.String("request_id", middleware.GetReqID(r.Context())),
 		)
+
+		var req MakeOrderRequest
+
+		err := render.DecodeJSON(r.Body, &req)
+		if errors.Is(err, io.EOF) {
+			log.Error("request body is empty")
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("empty request"))
+			return
+		}
+		if err != nil {
+			log.Error("failed to decode request body", slog.String("err", err.Error()))
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.Error("failed to decode request"))
+			return
+		}
 
 		auth := r.Header.Get("Authorization")
 		token, err := jwt_token.GetTokenFromRequest(auth)
@@ -60,7 +81,7 @@ func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.Handler
 			return
 		}
 
-		err = om.CreateOrder(customerId)
+		err = om.CreateOrder(customerId, req.Comment)
 		if errors.Is(err, storage.ErrEmptyOrder) {
 			log.Error("failed to make order", slog.String("err", err.Error()))
 			render.Status(r, http.StatusBadRequest)

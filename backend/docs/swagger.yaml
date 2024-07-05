@@ -176,6 +176,11 @@ definitions:
       status:
         type: string
     type: object
+  order.MakeOrderRequest:
+    properties:
+      comment:
+        type: string
+    type: object
   order.UpdateStatusRequest:
     properties:
       order_id:
@@ -256,6 +261,8 @@ definitions:
         type: string
       email:
         type: string
+      email_notification:
+        type: integer
       father_name:
         type: string
       first_name:
@@ -268,6 +275,8 @@ definitions:
         type: string
       telegram:
         type: string
+      telegram_notification:
+        type: integer
     type: object
   storage.CartItem:
     properties:
@@ -286,6 +295,8 @@ definitions:
         type: string
       email:
         type: string
+      email_notification:
+        type: integer
       father_name:
         type: string
       first_name:
@@ -300,11 +311,15 @@ definitions:
         type: string
       telegram:
         type: string
+      telegram_notification:
+        type: integer
       website_id:
         type: integer
     type: object
   storage.Order:
     properties:
+      comment:
+        type: string
       customer_id:
         type: integer
       date_time:
@@ -829,6 +844,13 @@ paths:
   /order/make:
     post:
       description: Создает заказ исходя из корзины покупателя
+      parameters:
+      - description: comment to order
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/order.MakeOrderRequest'
       produces:
       - application/json
       responses:

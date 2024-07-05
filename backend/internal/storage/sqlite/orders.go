@@ -14,6 +14,7 @@ func (s *Storage) initOrders() error {
 		customer_id INTEGER,
 		date_time TEXT,
 		status INTEGER,
+		comment TEXT,
 	    FOREIGN KEY (customer_id) REFERENCES customers (id)
 	);
 	`
@@ -26,17 +27,17 @@ func (s *Storage) initOrders() error {
 	return nil
 }
 
-func (s *Storage) CreateOrder(customerId int) error {
+func (s *Storage) CreateOrder(customerId int, comment string) error {
 	const op = "storage.sqlite.CreateOrder"
 
-	q := `INSERT INTO orders (customer_id, date_time, status) VALUES (?, datetime('now'), 0)`
+	q := `INSERT INTO orders (customer_id, date_time, status, comment) VALUES (?, datetime('now'), 0, ?)`
 
 	tx, err := s.db.Begin()
 	if err != nil {
 		return errWithRollback(tx, op, err)
 	}
 
-	res, err := tx.Exec(q, customerId)
+	res, err := tx.Exec(q, customerId, comment)
 	if err != nil {
 		return errWithRollback(tx, op, err)
 	}
@@ -97,46 +98,37 @@ func (s *Storage) SetOrderStatus(orderId int, status int) error {
 func (s *Storage) GetOrders(customerId int) ([]storage.Order, error) {
 	const op = "storage.sqlite.GetOrdersId"
 
-	q := `SELECT id, date_time, status FROM orders WHERE customer_id=?`
+	q := `SELECT id, date_time, status, comment FROM orders WHERE customer_id=?`
 
 	rows, err := s.db.Query(q, customerId)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	ordersId := make([]int, 0)
-	dateTimes := make([]string, 0)
-	statuses := make([]int, 0)
-
-	var id, status int
-	var dateTime string
+	res := make([]storage.Order, 0)
+	var orderId, status int
+	var dateTime, comment string
 
 	for rows.Next() {
-		if err = rows.Scan(&id, &dateTime, &status); err != nil {
+		if err = rows.Scan(&orderId, &dateTime, &status, &comment); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
-		ordersId = append(ordersId, id)
-		dateTimes = append(dateTimes, dateTime)
-		statuses = append(statuses, status)
-	}
 
-	res := make([]storage.Order, 0)
-
-	for i, orderId := range ordersId {
 		orderItems, err := s.GetOrderItems(orderId)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
-		o := storage.Order{
+		order := storage.Order{
 			Id:         orderId,
 			CustomerId: customerId,
-			DateTime:   dateTimes[i],
+			DateTime:   dateTime,
 			OrderItems: orderItems,
-			Status:     statuses[i],
+			Status:     status,
+			Comment:    comment,
 		}
 
-		res = append(res, o)
+		res = append(res, order)
 	}
 
 	return res, nil
@@ -145,14 +137,14 @@ func (s *Storage) GetOrders(customerId int) ([]storage.Order, error) {
 func (s *Storage) GetOrderById(id int) (*storage.Order, error) {
 	const op = "storage.sqlite.GetOrderById"
 
-	q := `SELECT customer_id, date_time, status FROM orders WHERE id=?;`
+	q := `SELECT customer_id, date_time, status, comment FROM orders WHERE id=?;`
 
 	row := s.db.QueryRow(q, id)
 
 	var customerId, status int
-	var dateTime string
+	var dateTime, comment string
 
-	if err := row.Scan(&customerId, &dateTime, &status); err != nil {
+	if err := row.Scan(&customerId, &dateTime, &status, &comment); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -167,6 +159,7 @@ func (s *Storage) GetOrderById(id int) (*storage.Order, error) {
 		DateTime:   dateTime,
 		OrderItems: orderItems,
 		Status:     status,
+		Comment:    comment,
 	}
 
 	return &order, nil
@@ -176,7 +169,7 @@ func (s *Storage) GetOrdersByWebsite(websiteId int) ([]storage.Order, error) {
 	const op = "storage.sqlite.GetOrdersByWebsite"
 
 	q := `
-		SELECT id, customer_id, date_time, status
+		SELECT id, customer_id, date_time, status, comment
 		FROM orders 
 		WHERE (SELECT website_id FROM customers WHERE customers.id=orders.customer_id)=?;
 	`
@@ -189,10 +182,10 @@ func (s *Storage) GetOrdersByWebsite(websiteId int) ([]storage.Order, error) {
 	res := make([]storage.Order, 0)
 
 	var id, customerId, status int
-	var dateTime string
+	var dateTime, comment string
 
 	for rows.Next() {
-		if err = rows.Scan(&id, &customerId, &dateTime, &status); err != nil {
+		if err = rows.Scan(&id, &customerId, &dateTime, &status, &comment); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
@@ -207,6 +200,7 @@ func (s *Storage) GetOrdersByWebsite(websiteId int) ([]storage.Order, error) {
 			DateTime:   dateTime,
 			OrderItems: orderItems,
 			Status:     status,
+			Comment:    comment,
 		}
 
 		res = append(res, order)
@@ -219,7 +213,7 @@ func (s *Storage) GetCompletedOrders(websiteId int) ([]storage.Order, error) {
 	const op = "storage.sqlite.GetOrdersByWebsite"
 
 	q := `
-		SELECT id, customer_id, date_time, status
+		SELECT id, customer_id, date_time, status, comment
 		FROM orders 
 		WHERE (SELECT website_id FROM customers WHERE customers.id=orders.customer_id)=? AND status=?;
 	`
@@ -232,10 +226,10 @@ func (s *Storage) GetCompletedOrders(websiteId int) ([]storage.Order, error) {
 	res := make([]storage.Order, 0)
 
 	var id, customerId, status int
-	var dateTime string
+	var dateTime, comment string
 
 	for rows.Next() {
-		if err = rows.Scan(&id, &customerId, &dateTime, &status); err != nil {
+		if err = rows.Scan(&id, &customerId, &dateTime, &status, &comment); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 
@@ -250,6 +244,7 @@ func (s *Storage) GetCompletedOrders(websiteId int) ([]storage.Order, error) {
 			DateTime:   dateTime,
 			OrderItems: orderItems,
 			Status:     status,
+			Comment:    comment,
 		}
 
 		res = append(res, order)

@@ -728,6 +728,17 @@
                     "order"
                 ],
                 "summary": "Make order",
+                "parameters": [
+                    {
+                        "description": "comment to order",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/order.MakeOrderRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1391,6 +1402,14 @@
                 }
             }
         },
+        "order.MakeOrderRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                }
+            }
+        },
         "order.UpdateStatusRequest": {
             "type": "object",
             "properties": {
@@ -1515,6 +1534,9 @@
                 "email": {
                     "type": "string"
                 },
+                "email_notification": {
+                    "type": "integer"
+                },
                 "father_name": {
                     "type": "string"
                 },
@@ -1532,6 +1554,9 @@
                 },
                 "telegram": {
                     "type": "string"
+                },
+                "telegram_notification": {
+                    "type": "integer"
                 }
             }
         },
@@ -1561,6 +1586,9 @@
                 "email": {
                     "type": "string"
                 },
+                "email_notification": {
+                    "type": "integer"
+                },
                 "father_name": {
                     "type": "string"
                 },
@@ -1582,6 +1610,9 @@
                 "telegram": {
                     "type": "string"
                 },
+                "telegram_notification": {
+                    "type": "integer"
+                },
                 "website_id": {
                     "type": "integer"
                 }
@@ -1590,6 +1621,9 @@
         "storage.Order": {
             "type": "object",
             "properties": {
+                "comment": {
+                    "type": "string"
+                },
                 "customer_id": {
                     "type": "integer"
                 },

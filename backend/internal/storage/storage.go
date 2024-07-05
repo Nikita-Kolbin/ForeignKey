@@ -77,6 +77,7 @@ type Order struct {
 	DateTime   string      `json:"date_time"`
 	Status     int         `json:"status"`
 	OrderItems []OrderItem `json:"order_items"`
+	Comment    string      `json:"comment"`
 }
 
 const (

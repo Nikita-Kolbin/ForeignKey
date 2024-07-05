@@ -735,6 +735,17 @@ const docTemplate = `{
                     "order"
                 ],
                 "summary": "Make order",
+                "parameters": [
+                    {
+                        "description": "comment to order",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/order.MakeOrderRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1398,6 +1409,14 @@ const docTemplate = `{
                 }
             }
         },
+        "order.MakeOrderRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                }
+            }
+        },
         "order.UpdateStatusRequest": {
             "type": "object",
             "properties": {
@@ -1522,6 +1541,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "email_notification": {
+                    "type": "integer"
+                },
                 "father_name": {
                     "type": "string"
                 },
@@ -1539,6 +1561,9 @@ const docTemplate = `{
                 },
                 "telegram": {
                     "type": "string"
+                },
+                "telegram_notification": {
+                    "type": "integer"
                 }
             }
         },
@@ -1568,6 +1593,9 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
+                "email_notification": {
+                    "type": "integer"
+                },
                 "father_name": {
                     "type": "string"
                 },
@@ -1589,6 +1617,9 @@ const docTemplate = `{
                 "telegram": {
                     "type": "string"
                 },
+                "telegram_notification": {
+                    "type": "integer"
+                },
                 "website_id": {
                     "type": "integer"
                 }
@@ -1597,6 +1628,9 @@ const docTemplate = `{
         "storage.Order": {
             "type": "object",
             "properties": {
+                "comment": {
+                    "type": "string"
+                },
                 "customer_id": {
                     "type": "integer"
                 },
