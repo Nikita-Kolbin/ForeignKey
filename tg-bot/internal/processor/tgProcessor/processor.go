@@ -9,6 +9,7 @@ import (
 )
 
 const limit = 100
+const msgRequest = "Пользователь добавлен 👌"
 
 type Processor struct {
 	tgClient client.TelegramClient
@@ -43,6 +44,11 @@ func (p *Processor) processUpdates() {
 		err = p.storage.CreateUser(u.Message.From.Username, u.Message.Chat.ID)
 		if err != nil {
 			log.Println("can't, create user:", err)
+		}
+
+		err = p.tgClient.Send(u.Message.Chat.ID, msgRequest)
+		if err != nil {
+			log.Println("can't, send message:", err)
 		}
 
 		log.Printf("fetch message: %s, from: %s", u.Message.Text, u.Message.From.Username)
