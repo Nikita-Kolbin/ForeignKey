@@ -909,6 +909,27 @@ paths:
       summary: Create product
       tags:
       - product
+  /product/delete/{id}:
+    delete:
+      description: Удаляет товар по id
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete product
+      tags:
+      - product
   /product/get-all-by-alias/{alias}:
     get:
       description: Возвращает ВСЕ ТОВАРЫ сайта по алиасу, только для админа
