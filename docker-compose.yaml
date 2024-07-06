@@ -23,7 +23,7 @@ services:
   tg-bot:
     build: ./tg-bot
     env_file:
-      - tg-bot/config/.env
+      - tg-bot/config/prod.env
     ports:
       - 8083:8083
     networks:
