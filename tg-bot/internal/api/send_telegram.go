@@ -43,6 +43,16 @@ func NewSendTelegram(tgs TgSender) http.HandlerFunc {
 			return
 		}
 
+		if len(req.Username) == 0 {
+			log.Printf("empty username")
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, responseError("empty username"))
+			return
+		}
+		if req.Username[0] == '@' {
+			req.Username = req.Username[1:]
+		}
+
 		err = tgs.Send(req.Username, req.Message)
 		if err != nil {
 			log.Printf("failed to send telegram: %s", err.Error())

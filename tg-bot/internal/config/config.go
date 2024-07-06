@@ -7,9 +7,10 @@ import (
 )
 
 type Config struct {
-	TgConfig     TgConfig
-	EmailConfig  EmailConfig
-	ServerConfig ServerConfig
+	TgConfig      TgConfig
+	EmailConfig   EmailConfig
+	ServerConfig  ServerConfig
+	StorageConfig StorageConfig
 }
 
 type TgConfig struct {
@@ -26,6 +27,11 @@ type EmailConfig struct {
 type ServerConfig struct {
 	Host string `env:"SERVER_HOST"`
 	Port string `env:"SERVER_PORT"`
+}
+
+type StorageConfig struct {
+	Path string `env:"STORAGE_PATH"`
+	Name string `env:"STORAGE_NAME"`
 }
 
 func MustLoad(dotenvPath string) Config {

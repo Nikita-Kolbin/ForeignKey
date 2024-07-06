@@ -11,9 +11,11 @@ import (
 	"tg-bot/internal/client/emailClient"
 	"tg-bot/internal/client/tgClient"
 	"tg-bot/internal/config"
+	"tg-bot/internal/processor/tgProcessor"
+	"tg-bot/internal/storage/sqlite"
 )
 
-const dotenvPath = "config/.env"
+const dotenvPath = "config/local.env"
 
 // @title           Notification
 // @version         1.0
@@ -32,10 +34,17 @@ func main() {
 		cfg.TgConfig.Token,
 	)
 
+	s, err := sqlite.New(cfg.StorageConfig.Path, cfg.StorageConfig.Name)
+	if err != nil {
+		log.Fatal("can't init storage:", err)
+	}
+
+	p := tgProcessor.New(tg, s)
+
 	router := chi.NewRouter()
 
 	router.Post("/send-email", api.NewSendEmail(email))
-	router.Post("/send-telegram", api.NewSendTelegram(tg))
+	router.Post("/send-telegram", api.NewSendTelegram(p))
 
 	serverAddress := cfg.ServerConfig.Host + ":" + cfg.ServerConfig.Port
 	router.Get("/swagger/*", httpSwagger.Handler(

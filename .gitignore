@@ -1,4 +1,5 @@
 backend/storage/storage.db
+tg-bot/storage/storage.db
 testdir
 hello
 images

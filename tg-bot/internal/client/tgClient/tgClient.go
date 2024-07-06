@@ -1,17 +1,19 @@
 package tgClient
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"path"
+	"strconv"
 )
 
 const (
 	tgBotHost         = "api.telegram.org"
 	sendMessageMethod = "sendMessage"
+	getUpdatesMethod  = "getUpdates"
 )
 
 type TGClient struct {
@@ -28,9 +30,28 @@ func New(token string) *TGClient {
 	}
 }
 
-func (c *TGClient) Send(username, msg string) error {
+func (c *TGClient) Updates(offset, limit int) ([]Update, error) {
 	q := url.Values{}
-	q.Add("chat_id", username)
+	q.Add("offset", strconv.Itoa(offset))
+	q.Add("limit", strconv.Itoa(limit))
+
+	data, err := c.doRequest(getUpdatesMethod, q)
+	if err != nil {
+		return nil, fmt.Errorf("can't get updates: %w", err)
+	}
+
+	var resp UpdatesResponse
+
+	if json.Unmarshal(data, &resp) != nil {
+		return nil, fmt.Errorf("can't get updates: %w", err)
+	}
+
+	return resp.Result, nil
+}
+
+func (c *TGClient) Send(chatId int, msg string) error {
+	q := url.Values{}
+	q.Add("chat_id", strconv.Itoa(chatId))
 	q.Add("text", msg)
 
 	if _, err := c.doRequest(sendMessageMethod, q); err != nil {
@@ -62,8 +83,6 @@ func (c *TGClient) doRequest(method string, query url.Values) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("can't do request: %w", err)
 	}
-
-	log.Println(string(body))
 
 	return body, nil
 }

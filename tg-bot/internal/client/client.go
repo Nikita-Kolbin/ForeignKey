@@ -1,9 +1,12 @@
 package client
 
+import "tg-bot/internal/client/tgClient"
+
 type EmailClient interface {
 	Send(receiverEmail, msg string) error
 }
 
 type TelegramClient interface {
-	Send(username, msg string) error
+	Send(chatId int, msg string) error
+	Updates(offset, limit int) ([]tgClient.Update, error)
 }
