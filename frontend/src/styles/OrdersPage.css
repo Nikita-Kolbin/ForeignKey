@@ -1,10 +1,11 @@
 .orders-page {
   width: 100%;
-  font-size: 20px;
+  font-size: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   color: #1a1a1a;
+  margin-top: 40px;
 }
 
 .orders-title {
@@ -22,45 +23,60 @@
 
 .orders-table {
   width: 80%;
-  border-collapse: collapse;
-  margin-top: 20px;
+  border-collapse: separate;
+  border-spacing: 0 10px; /* Горизонтальный и вертикальный отступы */
 }
 
 .orders-table th,
 .orders-table td {
-  border: 1px solid #ddd;
   padding: 12px;
 }
 
 .orders-table th {
-  background-color: #1a1a1a;
+  background-color: rgba(0, 0, 0, 0);
   font-weight: bold;
   text-align: center; /* Выравнивание по центру */
-  color: #fff;
+  color: #505050;
+  font-weight: 400;
 }
 
 .orders-table th:nth-child(5) {
-  background-color: #1a1a1a;
+  background-color: rgba(0, 0, 0, 0);
   color: #fff;
 }
 
 
 .orders-table tr:hover td {
-  background-color: #d9b3ff;
+  background-color: #fff;
 }
 
-.orders-details-button {
-  background-color: #4b0082;
+.orders-table thead button{
+  background-color: rgba(0, 0, 0, 0);
+  color: #5A57FF;
+  font-weight: 700;
+  transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+.orders-table thead button:hover{
+  background-color: #5A57FF;
   color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 12px 24px;
-  cursor: pointer;
 }
 
-.orders-details-button:hover {
-  background-color: #800080;
+.orders-table tbody tr{
+  background-color: #fff;
 }
+
+.orders-table tbody tr button{
+  background-color: rgba(0, 0, 0, 0);
+  color: #505050;
+  transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+.orders-table tbody tr button:hover{
+  color: #5A57FF;
+  border-color: rgba(0, 0, 0, 0);
+}
+
 
 .modal-wrapper {
   color:#1a1a1a;
@@ -97,4 +113,44 @@
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  border: 1px solid #5A57FF;
+  border-radius: 20px;
+  background-color: #fff;
+}
+
+.pagination button {
+  padding: 0 5px;
+  padding: 5px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: rgba(0,0,0,0);
+}
+
+.pagination button:first-child{
+  border-radius: 20px 0 0 20px;
+}
+
+.pagination button:last-child{
+  border-radius: 0 20px 20px 0;
+}
+
+.pagination select{
+  padding: 0 5px;
+  padding: 5px 10px;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #5A57FF;
+}
+
+.pagination button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

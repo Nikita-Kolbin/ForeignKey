@@ -18,6 +18,7 @@ const Template2 = () => {
   const [paymentType, setPaymentType] = useState('наличные');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [telegramName, setTelegramName] = useState('');
+  const [comment, setComment] = useState(''); // New state variable for the comment
 
   useEffect(() => {
     const fetchStyles = async () => {
@@ -148,12 +149,12 @@ const Template2 = () => {
 
   const handleMakeOrder = async () => {
     const token = localStorage.getItem('customerToken');
-
+  
     if (cartItems.length === 0) {
       alert('Корзина пуста. Добавьте товары в корзину перед созданием заказа.');
       return;
     }
-
+  
     try {
       const profileResponse = await fetch(`${API_BASE_URL}/customer/update-profile`, {
         method: 'PUT',
@@ -168,27 +169,32 @@ const Template2 = () => {
           last_name: fullName.split(' ')[0] || '',
           payment_type: paymentType,
           phone: phoneNumber,
-          telegram: telegramName
+          telegram: telegramName,
+          comment: comment // Include comment in the profile update request
         })
       });
-
+  
       const profileData = await profileResponse.json();
-
+  
       if (!profileResponse.ok || profileData.status !== 'OK') {
         console.error('Ошибка при обновлении профиля:', profileData.error);
         alert(`Ошибка при обновлении профиля: ${profileData.error}`);
         return;
       }
-
+  
       const orderResponse = await fetch(`${API_BASE_URL}/order/make`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json', // Ensure content type is set
           'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({
+          comment: comment // Include comment in the order creation request
+        })
       });
-
+  
       const orderData = await orderResponse.json();
-
+  
       if (orderResponse.ok && orderData.status === 'OK') {
         setCartItems([]);
         alert('Заказ успешно создан');
@@ -201,6 +207,7 @@ const Template2 = () => {
       alert('Ошибка при создании заказа. Попробуйте снова позже.');
     }
   };
+  
 
   return (
     <div
@@ -265,6 +272,14 @@ const Template2 = () => {
               type="text"
               value={telegramName}
               onChange={(e) => setTelegramName(e.target.value)}
+            />
+          </label>
+          <label>
+            Комментарий:
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
             />
           </label>
           <button onClick={handleMakeOrder}>Сделать заказ</button>
