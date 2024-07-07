@@ -55,6 +55,7 @@
   color: #5A57FF;
   font-weight: 700;
   transition: background-color 0.5s ease, color 0.3s ease;
+  border: none;
 }
 
 .orders-table thead button:hover{
@@ -70,6 +71,7 @@
   background-color: rgba(0, 0, 0, 0);
   color: #505050;
   transition: background-color 0.5s ease, color 0.3s ease;
+  border: none;
 }
 
 .orders-table tbody tr button:hover{
