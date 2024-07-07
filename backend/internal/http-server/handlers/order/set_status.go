@@ -5,6 +5,7 @@ import (
 	"ForeignKey/internal/http-server/response"
 	"ForeignKey/internal/storage"
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"io"
@@ -33,7 +34,7 @@ type UpdateStatusRequest struct {
 // @Param input body UpdateStatusRequest true "style to website"
 // @Success 200 {object} response.Response
 // @Router /order/set-status [patch]
-func NewSetStatus(sc StatusChanger, log *slog.Logger) http.HandlerFunc {
+func NewSetStatus(sc StatusChanger, ns NotificationService, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.order.NewSetStatus"
 
@@ -122,5 +123,58 @@ func NewSetStatus(sc StatusChanger, log *slog.Logger) http.HandlerFunc {
 		log.Info("status changed", slog.Int("order id", req.OrderId))
 
 		render.JSON(w, r, response.OK())
+
+		go sendNotification(customer, &req, ns, log)
+	}
+}
+
+func sendNotification(
+	customer *storage.Customer,
+	req *UpdateStatusRequest,
+	ns NotificationService,
+	log *slog.Logger,
+) {
+	const op = "handlers.order.SetStatus.sendNotification"
+
+	log = log.With(
+		slog.String("op", op),
+	)
+
+	var status string
+	switch req.Status {
+	case storage.StatusAwaitingConfirm:
+		status = "Ожидает подтверждения"
+	case storage.StatusAcceptedForProcessing:
+		status = "Принят в работу"
+	case storage.StatusInProgress:
+		status = "В работе"
+	case storage.StatusMade:
+		status = "Заказ готов"
+	case storage.StatusSent:
+		status = "Заказ отправлен"
+	case storage.StatusDelivered:
+		status = "Заказ доставлен"
+	case storage.StatusCompleted:
+		status = "Заказ завершен"
+	case storage.StatusUnusualSituation:
+		status = "Нестандартная ситуация"
+	default:
+		status = "Неизвестный статус"
+	}
+
+	msg := fmt.Sprintf("Статус заказа %d обновлен: '%s'", req.OrderId, status)
+
+	if customer.EmailNotification == 1 {
+		err := ns.SendEmail(customer.Email, msg)
+		if err != nil {
+			log.Error("can't send email", slog.String("err", err.Error()))
+		}
+	}
+
+	if customer.TelegramNotification == 1 {
+		err := ns.SendTelegram(customer.Telegram, msg)
+		if err != nil {
+			log.Error("can't send telegram", slog.String("err", err.Error()))
+		}
 	}
 }
