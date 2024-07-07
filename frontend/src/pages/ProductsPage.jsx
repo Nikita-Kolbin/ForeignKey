@@ -17,6 +17,8 @@ const ProductPage = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     if (!siteAlias) {
@@ -102,6 +104,60 @@ const ProductPage = () => {
     setCurrentPage(1);
   };
 
+  const handleDeleteProduct = (product, event) => {
+    event.stopPropagation();
+    setProductToDelete(product);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteProduct = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/product/delete/${productToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        setProducts((prevProducts) => prevProducts.filter((p) => p.id !== productToDelete.id));
+        setIsDeleteModalOpen(false);
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Не удалось удалить продукт');
+      }
+    } catch (error) {
+      console.error('Ошибка при удалении продукта:', error);
+      setError('Ошибка при удалении продукта. Попробуйте снова позже.');
+    }
+  };
+
+  const handleToggleProductVisibility = async (product, event) => {
+    event.stopPropagation();
+    try {
+      const response = await fetch(`${API_BASE_URL}/product/set-active`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          alias: siteAlias,
+          product_id: product.id,
+          active: product.active ? 0 : 1
+        })
+      });
+
+      if (response.ok) {
+        fetchProducts(siteAlias); // Reload products to reflect the change
+      } else {
+        console.error('Failed to update product visibility');
+      }
+    } catch (error) {
+      console.error('Error updating product visibility:', error);
+    }
+  };
+
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.description?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -112,38 +168,7 @@ const ProductPage = () => {
   const renderProductRow = (product) => {
     const imageIds = product.images_id ? product.images_id.split(' ') : [];
     const firstImageId = imageIds[0];
-  
-    const handleToggleProductVisibility = async (product, event) => {
-      event.stopPropagation();
-      try {
-        const response = await fetch(`${API_BASE_URL}/product/set-active`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            alias: siteAlias,
-            product_id: product.id,
-            active: product.active ? 0 : 1
-          })
-        });
-  
-        if (response.ok) {
-          fetchProducts(siteAlias); // Reload products to reflect the change
-        } else {
-          console.error('Failed to update product visibility');
-        }
-      } catch (error) {
-        console.error('Error updating product visibility:', error);
-      }
-    };
-  
-    const handleDeleteProduct = async (product, event) => {
-      event.stopPropagation();
-      // Add your delete product logic here
-    };
-  
+
     return (
       <tr key={product.id} onClick={() => handleProductClick(product)}>
         <td>
@@ -234,6 +259,16 @@ const ProductPage = () => {
             <div className="modal" onClick={(e) => e.stopPropagation()}>
               <span className="close" onClick={handleCloseAddForm}>&times;</span>
               <AddProductForm siteAlias={siteAlias} />
+            </div>
+          </div>
+        )}
+        {isDeleteModalOpen && (
+          <div className="modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <h3>Вы правда хотите удалить товар {productToDelete?.name}?</h3>
+              <button onClick={confirmDeleteProduct} className="confirm-delete-button">Удалить</button>
+              <button onClick={() => setIsDeleteModalOpen(false)} className="cancel-button">Отмена</button>
+              {error && <div className="error-message">{error}</div>}
             </div>
           </div>
         )}
