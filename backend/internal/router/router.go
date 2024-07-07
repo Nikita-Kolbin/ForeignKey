@@ -80,7 +80,7 @@ func New(
 	router.Get("/api/order/get", order.NewGet(storage, log))
 	router.Get("/api/order/get-by-alias/{alias}", order.NewGetByAlias(storage, log))
 	router.Get("/api/order/get-completed/{alias}", order.NewGetCompletedOrders(storage, log))
-	router.Patch("/api/order/set-status", order.NewSetStatus(storage, log))
+	router.Patch("/api/order/set-status", order.NewSetStatus(storage, nc, log))
 
 	return router
 }
