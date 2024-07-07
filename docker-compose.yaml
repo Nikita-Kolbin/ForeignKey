@@ -9,6 +9,8 @@ services:
     networks:
       - foreign_key_nw
     command: ./build
+    depends_on:
+      - tg-bot
 
   frontend:
     build: ./frontend
@@ -29,8 +31,6 @@ services:
     networks:
       - foreign_key_nw
     command: ./build
-    depends_on:
-      - backend
 
 networks:
   foreign_key_nw: { }

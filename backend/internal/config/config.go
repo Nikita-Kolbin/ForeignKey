@@ -14,7 +14,6 @@ type Config struct {
 	StorageName string `env:"STORAGE_NAME" env-required:"true"`
 	ImagesPath  string `env:"IMAGES_PATH" env-required:"true"`
 	HTTPServer
-	Email
 	NotificationClientConfig NotificationClientConfig
 }
 
@@ -22,13 +21,6 @@ type HTTPServer struct {
 	Address     string        `env:"SERVER_ADDRESS" env-default:"localhost:8082"`
 	Timeout     time.Duration `env:"SERVER_TIMEOUT" env-default:"10s"`
 	IdleTimeout time.Duration `env:"SERVER_IDLE_TIMEOUT" env-default:"60s"`
-}
-
-type Email struct {
-	EmailAddress string `env:"EMAIL_ADDRESS"`
-	Password     string `env:"EMAIL_PASSWORD"`
-	SmtpHost     string `env:"SMTP_HOST"`
-	SmtpPort     string `env:"SMTP_PORT"`
 }
 
 type NotificationClientConfig struct {
