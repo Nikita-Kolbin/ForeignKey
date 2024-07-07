@@ -1,6 +1,6 @@
 .product-list-container {
   width: 100%;
-  font-size: 20px;
+  font-size: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,57 +8,166 @@
 }
 
 .search-container {
-  margin-bottom: 20px;
+  margin-top: 80px !important;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-container div{
+  width: 80%;
+  text-align: left;
+  margin-left: 5%;
+}
+
+
+.search-container button{
+  background-color: #fff;
+  color: #5A57FF;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  border: 1px #505050;
+  border-radius: 10px 10px 0 0;
+}
+
+.search-container .product-details-button{
+  background-color: rgba(0, 0, 0, 0);
+  color: #505050;
+  font-weight: 400;
+  border-radius: none;
+  border-style: solid solid none solid;
+}
+
+.search-container .product-details-button:hover{
+  color: #5A57FF;
+}
+
+.search-container .product-details-button:focus{
+  color: #5A57FF;
+  border-color: #5A57FF;
 }
 
 .search-input {
-  padding: 8px;
-  width: 300px;
+  margin: auto 0;
+  width: 200px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-right: 10px;
+  background-color: #fff;
+  font-size: 20px;
+  color: #505050;
 }
 
 .product-table {
   width: 80%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  background-color: #fff;
+  border-radius: 15px;
 }
 
-.product-table th,
-.product-table td {
-  border: 1px solid #ddd;
+.product-table th, .product-table td {
   padding: 12px;
+  text-align: center;
 }
+
+
 
 .product-table th {
-  background-color: #f2f2f2;
+  background-color: rgba(0, 0, 0, 0);
   font-weight: bold;
-  text-align: left;
+  color: #505050;
+  font-weight: 400;
 }
-.product-table tr th {
-  background-color: #1a1a1a;
+
+.product-table thead th:last-child{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-table th:nth-child(5) {
+  background-color: rgba(0, 0, 0, 0);
   color: #fff;
 }
 
-.product-table tr:hover {
-  background-color: #f2f2f2;
+.product-table tbody tr td {
+  background-color: #E5E5FE;
 }
 
-.product-table tr:hover td {
+.product-table tbody tr td:last-child{
+  border-right: 40px solid #fff;
+}
+
+.product-table tbody tr td:first-child{
+  border-left: 40px solid #fff;
+}
+
+.product-table tbody tr:hover td {
   background-color: #d9b3ff;
 }
 
-.product-details-button {
-  background-color: #4b0082;
-  color: #fff;
+.product-table tbody button{
+  background-color: rgba(0, 0, 0, 0);
   border: none;
-  border-radius: 4px;
-  padding: 12px 24px;
-  cursor: pointer;
 }
 
-.product-details-button:hover {
-  background-color: #800080;
+.product-table tbody button img{
+  width: 45px;
+  height: 45px;
+}
+
+.product-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  border: 1px solid #5A57FF;
+  border-radius: 20px;
+  background-color: #fff;
+}
+
+.pagination button {
+  padding: 5px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.pagination button:first-child {
+  border-radius: 20px 0 0 20px;
+}
+
+.pagination button:last-child {
+  border-radius: 0 20px 20px 0;
+}
+
+.pagination select {
+  padding: 5px 10px;
+  font-size: 20px;
+  cursor: pointer;
+  background-color: #fff;
+  color: #5A57FF;
+}
+
+.pagination button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .modal-wrapper {
@@ -95,59 +204,4 @@
   color: black;
   text-decoration: none;
   cursor: pointer;
-}
-
-.add-product-form input {
-  display: block;
-  margin-bottom: 10px;
-  padding: 10px;
-  width: calc(100% - 22px);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.add-product-form button {
-  background-color: #4b0082;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.add-product-form button:hover {
-  background-color: #800080;
-}
-
-.product-details-container {
-  margin-top: 20px;
-}
-
-.product-list {
-  margin-top: 20px;
-}
-
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.product-table th, .product-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-
-.product-table th {
-  background-color: #f2f2f2;
-  text-align: left;
-}
-
-.product-table tr:hover {
-  background-color: #f1f1f1;
-}
-
-.product-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
 }
