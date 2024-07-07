@@ -178,6 +178,19 @@ func (s *Storage) SetProductActive(productId, active int) error {
 	return nil
 }
 
+func (s *Storage) DeleteProduct(id int) error {
+	const op = "storage.sqlite.DeleteProduct"
+
+	q := `DELETE FROM products WHERE id=?`
+
+	_, err := s.db.Exec(q, id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
 func validateImagesId(ids string) error {
 	if len(ids) == 0 {
 		return nil

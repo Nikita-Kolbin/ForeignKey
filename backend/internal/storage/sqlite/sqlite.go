@@ -19,7 +19,8 @@ func New(storagePath, storageName string) (*Storage, error) {
 		_ = os.MkdirAll(storagePath, os.ModePerm)
 	}
 
-	db, err := sql.Open("sqlite3", path.Join(storagePath, storageName))
+	p := path.Join(storagePath, storageName)
+	db, err := sql.Open("sqlite3", "file:"+p+"?_foreign_keys=on")
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

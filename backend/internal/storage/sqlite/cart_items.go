@@ -14,7 +14,7 @@ func (s *Storage) initCartItems() error {
 		product_id INTEGER,
 		count INTEGER,
 	    FOREIGN KEY (cart_id) REFERENCES carts (id),
-	    FOREIGN KEY (product_id) REFERENCES products (id)
+	    FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE
 	);
 	`
 
