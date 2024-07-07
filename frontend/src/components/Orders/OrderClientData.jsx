@@ -3,14 +3,19 @@ import React from 'react';
 const OrderClientData = ({ clientData, orderDate }) => {
   return (
     <div>
-      <h3>Данные клиента</h3>
-      <p>ФИО: {clientData.fullName}</p>
-      <p>Почта: {clientData.email}</p>
-      <p>Способ оплаты: {clientData.paymentMethod}</p>
-      <p>Доставка: {clientData.delivery}</p>
-      <p>Телефон: {clientData.phone}</p>
-      <p>Дата оформления заказа: {orderDate}</p>
-      <p>Имя в телеграмм: {clientData.telegram}</p>
+      <div className='information-client'>
+        <p className='personal-info-client'>ФИО: <span>{clientData.fullName}</span></p>
+        <p className='personal-info-client'>Доставка: <span>{clientData.delivery}</span></p>
+      </div>
+      <div className='information-client'>
+        <p className='personal-info-client'>Почта: <span>{clientData.email}</span></p>
+        <p className='personal-info-client'>Способ оплаты: <span>{clientData.paymentMethod}</span></p>
+      </div>
+      <div className='information-client'>
+        <p className='personal-info-client'>Телефон: <span>{clientData.phone}</span></p>
+        <p className='personal-info-client'>Имя в телеграмм: <span>{clientData.telegram}</span></p>
+      </div>
+      <p className='personal-info-client'>Дата оформления заказа: <span>{orderDate}</span></p>
     </div>
   );
 };

@@ -93,13 +93,26 @@
   align-items: center;
 }
 
-.modal {
+
+.modal-wrapper .modal {
   background-color: #fefefe;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  max-width: 80%;
+  max-width: 100%;
   overflow: auto;
+  max-height: 90vh;
+  font-size: 24px;
+  font-weight: 400;
+  color: #222020;
+}
+
+.modal h2{
+  font-size: 24px;
+}
+
+.modal h2 span{
+  color: #5A57FF;
 }
 
 .close {
@@ -155,4 +168,128 @@
 .pagination button[disabled] {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.order-product-table {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 15px;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.order-product-table th, .order-product-table td {
+  text-align: center;
+  color: #505050;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.order-product-table th {
+  background-color: rgba(0, 0, 0, 0);
+  font-weight: bold;
+  color: #505050;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+.order-product-table td{
+  color: #000;
+}
+
+.order-product-table thead th:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.order-product-table tbody tr td {
+  background-color: #E5E5FE;
+}
+
+
+
+.order-product-table tbody tr:hover td {
+  background-color: #d9b3ff;
+}
+
+.order-product-table tbody button {
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+}
+
+.order-product-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Это обеспечит контейнеру высоту строки таблицы */
+}
+
+.order-product-image-container  .order-product-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; /* Это обеспечит правильное масштабирование изображения */
+}
+
+
+.order-product-image {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.information-client{
+  display: flex;
+  justify-content: space-between;
+  color: #222020;
+}
+
+.information-client span{
+  color: #5A57FF;
+}
+
+.information-client .valuta{
+  font-weight: 300;
+  color: #505050;
+}
+
+.information-client-selector{
+  text-align: left;
+}
+
+.information-client .personal-info-client span{
+  font-weight: 300;
+  color: #222020;
+  white-space: nowrap;
+}
+
+.comment-section {
+  margin-top: 20px;
+}
+
+.comment-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.comment-content {
+  font-weight: 300;
+  text-align: left;
+  border: 1px dashed #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  white-space: pre-wrap; /* сохраняет переносы строк */
+  color: #000000;
+}
+
+#order-status{
+  font-size: 24px;
+  background-color: #fff;
+  color: #222020;
 }

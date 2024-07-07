@@ -74,12 +74,13 @@ const OrdersPage = () => {
               amount: calculateTotalPrice(order.order_items),
               date: formatDate(order.date_time),
               status: order.status,
-              comment: order.comment, // Добавляем комментарий к заказу
+              comment: order.comment,
               products: order.order_items.map(item => ({
                 id: item.product.id,
                 name: item.product.name,
                 price: item.product.price,
-                quantity: item.count
+                quantity: item.count,
+                images_id: item.product.images_id // Добавляем images_id сюда
               })),
               clientData
             };
@@ -113,12 +114,13 @@ const OrdersPage = () => {
               amount: calculateTotalPrice(order.order_items),
               date: formatDate(order.date_time),
               status: order.status,
-              comment: order.comment, // Добавляем комментарий к заказу
+              comment: order.comment,
               products: order.order_items.map(item => ({
                 id: item.product.id,
                 name: item.product.name,
                 price: item.product.price,
-                quantity: item.count
+                quantity: item.count,
+                images_id: item.product.images_id // Добавляем images_id сюда
               })),
               clientData
             };
@@ -146,9 +148,9 @@ const OrdersPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok && data.status === 'OK') {
         const customer = data.customers.find(customer => customer.id === customerId);
         if (customer) {
@@ -159,7 +161,7 @@ const OrdersPage = () => {
             delivery: customer.delivery_type,
             phone: customer.phone,
             telegram: customer.telegram,
-            comment: customer.comment // Убедитесь, что комментарий включен
+            comment: customer.comment
           };
         } else {
           console.error('Клиент не найден');
@@ -174,7 +176,6 @@ const OrdersPage = () => {
       return {};
     }
   };
-  
 
   const handleOrderStatusChange = async (orderId, newStatus) => {
     try {
@@ -295,26 +296,33 @@ const OrdersPage = () => {
         <div className="modal-wrapper" onClick={() => setSelectedOrder(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <span className="close" onClick={() => setSelectedOrder(null)}>&times;</span>
-            <h2>Заказ номер: {selectedOrder.id}</h2>
+            <h2>Заказ номер: <span>{selectedOrder.id}</span></h2>
             <OrderProductsTable products={selectedOrder.products} />
-            <p>Итого: ${calculateTotalPrice(selectedOrder.products).toFixed(2)}</p>
-            <p>Всего товаров: {calculateTotalQuantity(selectedOrder.products)}</p>
-            <p>Оформлен: {selectedOrder.date}</p>
+            <div className='information-client'>
+              <p>Итого: <span>{calculateTotalPrice(selectedOrder.products).toFixed(0)}</span> <span className='valuta'>руб</span></p>
+              <p>Всего товаров: <span>{calculateTotalQuantity(selectedOrder.products)}</span></p>
+            </div>
+            <div className='information-client'>
+              <div>
+                <label htmlFor="order-status">Статус заказа:</label>
+                <select
+                  id="order-status"
+                  value={selectedOrder.status}
+                  onChange={(e) => handleOrderStatusChange(selectedOrder.id, parseInt(e.target.value))}
+                >
+                  {orderStatuses.map(status => (
+                    <option key={status.value} value={status.value}>
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            
             <OrderClientData clientData={selectedOrder.clientData} orderDate={selectedOrder.date} />
-            <p>Комментарий: {selectedOrder.comment}</p> {/* Отображение комментария */}
-            <div>
-              <label htmlFor="order-status">Статус заказа:</label>
-              <select
-                id="order-status"
-                value={selectedOrder.status}
-                onChange={(e) => handleOrderStatusChange(selectedOrder.id, parseInt(e.target.value))}
-              >
-                {orderStatuses.map(status => (
-                  <option key={status.value} value={status.value}>
-                    {status.label}
-                  </option>
-                ))}
-              </select>
+            <div className="comment-section">
+              <p className="comment-label">Комментарий:</p>
+              <div className="comment-content">{selectedOrder.comment}</div>
             </div>
           </div>
         </div>
