@@ -5,6 +5,7 @@ import (
 	"ForeignKey/internal/http-server/response"
 	"ForeignKey/internal/storage"
 	"errors"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"io"
@@ -15,10 +16,13 @@ import (
 type OrdersMaker interface {
 	CreateOrder(customerId int, comment string) error
 	GetCustomer(id int) (*storage.Customer, error)
+	GetWebsiteById(id int) (adminId int, alias string, err error)
+	GetAdminById(id int) (*storage.Admin, error)
 }
 
-type EmailSender interface {
-	Send(receiverEmail, msg string) error
+type NotificationService interface {
+	SendEmail(email, msg string) error
+	SendTelegram(username, msg string) error
 }
 type MakeOrderRequest struct {
 	Comment string `json:"comment"`
@@ -33,7 +37,7 @@ type MakeOrderRequest struct {
 // @Param input body MakeOrderRequest true "comment to order"
 // @Success 200 {object} response.Response
 // @Router /order/make [post]
-func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.HandlerFunc {
+func NewMakeOrder(om OrdersMaker, ns NotificationService, log *slog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.order.NewMakeOrder"
 
@@ -99,24 +103,75 @@ func NewMakeOrder(om OrdersMaker, es EmailSender, log *slog.Logger) http.Handler
 
 		render.JSON(w, r, response.OK())
 
-		go sendEmail(om, es, log, customerId)
+		customer, err := om.GetCustomer(customerId)
+		if err != nil {
+			log.Error("can't get customer", slog.String("err", err.Error()))
+			return
+		}
+		go sendToCustomer(customer, ns, log)
+
+		adminId, _, err := om.GetWebsiteById(customer.WebsiteId)
+		if err != nil {
+			log.Error("can't get website", slog.String("err", err.Error()))
+			return
+		}
+		admin, err := om.GetAdminById(adminId)
+		if err != nil {
+			log.Error("can't get admin", slog.String("err", err.Error()))
+			return
+		}
+		go sendToAdmin(admin, customer, ns, log, req.Comment)
 	}
 }
 
-func sendEmail(om OrdersMaker, es EmailSender, log *slog.Logger, customerId int) {
-	const op = "handlers.order.NewMakeOrder"
+func sendToCustomer(customer *storage.Customer, ns NotificationService, log *slog.Logger) {
+	const op = "handlers.order.NewMakeOrder.sendToCustomer"
 
 	log = log.With(
 		slog.String("op", op),
 	)
 
-	customer, err := om.GetCustomer(customerId)
-	if err != nil {
-		log.Error("can't get customer", slog.String("err", err.Error()))
+	if customer.EmailNotification == 1 {
+		err := ns.SendEmail(customer.Email, "Заказ оформлен")
+		if err != nil {
+			log.Error("can't send email", slog.String("err", err.Error()))
+		}
 	}
 
-	err = es.Send(customer.Email, "Заказ оформлен")
-	if err != nil {
-		log.Error("can't send message", slog.String("err", err.Error()))
+	if customer.TelegramNotification == 1 {
+		err := ns.SendTelegram(customer.Telegram, "Заказ оформлен")
+		if err != nil {
+			log.Error("can't send telegram", slog.String("err", err.Error()))
+		}
+	}
+}
+
+func sendToAdmin(
+	admin *storage.Admin,
+	customer *storage.Customer,
+	ns NotificationService,
+	log *slog.Logger,
+	comment string,
+) {
+	const op = "handlers.order.NewMakeOrder.sendToAdmin"
+
+	log = log.With(
+		slog.String("op", op),
+	)
+
+	msg := spew.Sprintf("Пользователь %s совершил заказ, комментарий: '%s'", customer.Email, comment)
+
+	if admin.EmailNotification == 1 {
+		err := ns.SendEmail(admin.Email, msg)
+		if err != nil {
+			log.Error("can't send email", slog.String("err", err.Error()))
+		}
+	}
+
+	if admin.TelegramNotification == 1 {
+		err := ns.SendTelegram(admin.Telegram, msg)
+		if err != nil {
+			log.Error("can't send telegram", slog.String("err", err.Error()))
+		}
 	}
 }

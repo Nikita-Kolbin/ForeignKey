@@ -8,7 +8,7 @@ import (
 
 func (s *Storage) initSavedProducts() error {
 	q := `
-	CREATE TABLE IF NOT EXISTS seved_products (
+	CREATE TABLE IF NOT EXISTS saved_products (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		website_id INTEGER,
 		name TEXT,
@@ -32,7 +32,7 @@ func (s *Storage) initSavedProducts() error {
 func (s *Storage) CreateSavedProduct(p *storage.ProductInfo, tx *sql.Tx) (int, error) {
 	const op = "storage.sqlite.CreateSavedProduct"
 
-	q := `INSERT INTO seved_products (website_id, name, description, price, images_id, active, tags) 
+	q := `INSERT INTO saved_products (website_id, name, description, price, images_id, active, tags) 
 		  VALUES (?, ?, ?, ?, ?, ?, ?)`
 
 	res, err := tx.Exec(q, p.WebsiteId, p.Name, p.Description, p.Price, p.ImagesId, p.Active, p.Tags)
@@ -52,7 +52,7 @@ func (s *Storage) GetSavedProduct(productId int) (*storage.ProductInfo, error) {
 	const op = "storage.sqlite.GetSavedProduct"
 
 	q := `SELECT id, website_id, name, description, price, images_id, active, tags 
-		  FROM seved_products WHERE id=?`
+		  FROM saved_products WHERE id=?`
 
 	row := s.db.QueryRow(q, productId)
 

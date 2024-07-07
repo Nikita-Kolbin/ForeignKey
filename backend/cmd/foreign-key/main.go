@@ -1,8 +1,8 @@
 package main
 
 import (
-	"ForeignKey/internal/email"
 	"ForeignKey/internal/image"
+	"ForeignKey/internal/notification_client"
 	"ForeignKey/internal/router"
 	"log/slog"
 	"net/http"
@@ -56,11 +56,10 @@ func main() {
 	}
 
 	// email
-	emailSender := email.New(cfg.EmailAddress, cfg.Password, cfg.SmtpHost, cfg.SmtpPort)
-	_ = emailSender
+	nc := notification_client.New(cfg.NotificationClientConfig)
 
 	// http router
-	r := router.New(storage, imageSaver, emailSender, log)
+	r := router.New(storage, imageSaver, nc, log)
 
 	// swagger
 	r.Get("/swagger/*", httpSwagger.Handler(

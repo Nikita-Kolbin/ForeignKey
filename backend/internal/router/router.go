@@ -1,7 +1,6 @@
 package router
 
 import (
-	"ForeignKey/internal/email"
 	"ForeignKey/internal/http-server/handlers/admin"
 	"ForeignKey/internal/http-server/handlers/cart"
 	"ForeignKey/internal/http-server/handlers/customer"
@@ -11,6 +10,7 @@ import (
 	"ForeignKey/internal/http-server/handlers/website"
 	mwLogger "ForeignKey/internal/http-server/middleware/logger"
 	"ForeignKey/internal/image"
+	"ForeignKey/internal/notification_client"
 	"ForeignKey/internal/storage/sqlite"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -18,7 +18,12 @@ import (
 	"log/slog"
 )
 
-func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Email, log *slog.Logger) *chi.Mux {
+func New(
+	storage *sqlite.Storage,
+	imageSaver *image.Image,
+	nc *notification_client.NotificationClient,
+	log *slog.Logger,
+) *chi.Mux {
 	router := chi.NewRouter()
 
 	// middleware
@@ -71,9 +76,7 @@ func New(storage *sqlite.Storage, imageSaver *image.Image, emailSender *email.Em
 	router.Patch("/api/cart/change-count", cart.NewChangeCount(storage, log))
 	router.Get("/api/cart/get", cart.NewGet(storage, log))
 
-	// TODO: добавить сохранение цены товара на момент заказа
-	// TODO: добавить статус заказа
-	router.Post("/api/order/make", order.NewMakeOrder(storage, emailSender, log))
+	router.Post("/api/order/make", order.NewMakeOrder(storage, nc, log))
 	router.Get("/api/order/get", order.NewGet(storage, log))
 	router.Get("/api/order/get-by-alias/{alias}", order.NewGetByAlias(storage, log))
 	router.Get("/api/order/get-completed/{alias}", order.NewGetCompletedOrders(storage, log))

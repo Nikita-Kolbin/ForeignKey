@@ -15,6 +15,7 @@ type Config struct {
 	ImagesPath  string `env:"IMAGES_PATH" env-required:"true"`
 	HTTPServer
 	Email
+	NotificationClientConfig NotificationClientConfig
 }
 
 type HTTPServer struct {
@@ -28,6 +29,11 @@ type Email struct {
 	Password     string `env:"EMAIL_PASSWORD"`
 	SmtpHost     string `env:"SMTP_HOST"`
 	SmtpPort     string `env:"SMTP_PORT"`
+}
+
+type NotificationClientConfig struct {
+	EmailURL    string `env:"NOTIFICATION_EMAIL_URL"`
+	TelegramURL string `env:"NOTIFICATION_TELEGRAM_URL"`
 }
 
 func MustLoad(dotenvPath string) *Config {
