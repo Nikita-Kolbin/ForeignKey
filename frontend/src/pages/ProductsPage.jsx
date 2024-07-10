@@ -246,14 +246,7 @@ const ProductPage = () => {
             <img src="/Вперед.svg" alt="Вперед" />
           </button>
         </div>
-        {selectedProduct && (
-          <div className="modal-wrapper" onClick={handleCloseProductDetails}>
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-              <span className="close" onClick={handleCloseProductDetails}>&times;</span>
-              <ProductDetails product={selectedProduct} alias={siteAlias} />
-            </div>
-          </div>
-        )}
+        
         {showAddForm && (
           <div className="modal-wrapper" onClick={handleCloseAddForm}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
