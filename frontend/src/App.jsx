@@ -9,7 +9,7 @@ import PersonalDashboard from './pages/PersonalDashboard';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ClientsPage from './pages/ClientListPage';
 import ProductsPage from './pages/ProductsPage';
-import clients from './components/ClientDashboard/clientsData';
+// import clients from './components/ClientDashboard/clientsData';
 import OrdersPage from './pages/OrdersPage';
 import ConstructorPage from './pages/ConstructorPage';
 import ConstructorTemplate from './components/Constructor/ConstructorTemplate';
@@ -26,7 +26,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<PersonalDashboard />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/clients" element={<ClientsPage clients={clients} />} />
+        <Route path="/clients" element={<ClientsPage/>} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/constructor" element={<ConstructorPage />} />

@@ -75,8 +75,8 @@ const EditProfileForm = ({ userData, onSaveChanges }) => {
   };
 
   const handleSave = async () => {
-    const { first_name, last_name, father_name, city, image_id } = editedData;
-    const updatedUserData = { first_name, last_name, father_name, city, image_id: selectedImageId || image_id };
+    const { first_name, last_name, father_name, city, image_id, telegram } = editedData;
+    const updatedUserData = { first_name, last_name, father_name, city, image_id: selectedImageId || image_id, telegram };
     try {
       const response = await fetch(`${API_BASE_URL}/admin/update-profile`, {
         method: 'PUT',
@@ -105,7 +105,7 @@ const EditProfileForm = ({ userData, onSaveChanges }) => {
         <label className="image-upload-label">
           Изображение:
           <div className="image-upload-container">
-            <input type="file" accept="image/*" onChange={handleImageChange}  class="view-image"/>
+            <input type="file" accept="image/*" onChange={handleImageChange} className="view-image"/>
             {imageSrc ? (
               <img src={imageSrc} alt="Загруженное изображение" className="uploaded-image" />
             ) : (
@@ -129,6 +129,11 @@ const EditProfileForm = ({ userData, onSaveChanges }) => {
           </label>
           <label>
             <input type="text" name="city" value={editedData.city} onChange={handleInputChange} className="personal-input" placeholder="Город" />
+          </label>
+        </div>
+        <div>
+          <label>
+            <input type="text" name="telegram" value={editedData.telegram} onChange={handleInputChange} className="personal-input" placeholder="Telegram" />
           </label>
         </div>
         <div className="button-container">
