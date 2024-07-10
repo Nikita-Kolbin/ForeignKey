@@ -83,6 +83,41 @@ const Template2 = () => {
     fetchCartItems();
   }, []);
 
+  const fetchCustomerProfile = async () => {
+    const token = localStorage.getItem('customerToken');
+    if (token) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/customer/get-profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'OK') {
+          const profile = data.profile;
+          setDeliveryType(profile.delivery_type || 'курьер');
+          setFullName(`${profile.last_name} ${profile.first_name} ${profile.father_name}`);
+          setPaymentType(profile.payment_type || 'наличные');
+          setPhoneNumber(profile.phone || '');
+          setTelegramName(profile.telegram || '');
+        } else {
+          console.error('Ошибка при получении профиля клиента:', data.error);
+        }
+      } catch (error) {
+        console.error('Ошибка при получении профиля клиента:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (customerLoggedIn) {
+      fetchCustomerProfile();
+    }
+  }, [customerLoggedIn]);
+
   const handleSignInSuccess = () => {
     setCustomerLoggedIn(true);
     setShowSignIn(false);
@@ -207,7 +242,6 @@ const Template2 = () => {
       alert('Ошибка при создании заказа. Попробуйте снова позже.');
     }
   };
-  
 
   return (
     <div
