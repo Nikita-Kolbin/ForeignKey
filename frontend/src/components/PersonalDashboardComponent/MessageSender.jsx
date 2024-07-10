@@ -1,16 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../ApiConfig';
 import '../styles/MessageSender.css';
 
 const MessageSender = () => {
   const [messengerNotification, setMessengerNotification] = useState(false);
   const [emailNotification, setEmailNotification] = useState(false);
 
-  const handleMessengerToggle = () => {
-    setMessengerNotification(!messengerNotification);
+  useEffect(() => {
+    // Fetch initial states from localStorage
+    const initialMessengerStatus = localStorage.getItem('telegramNotification') === 'true';
+    const initialEmailStatus = localStorage.getItem('emailNotification') === 'true';
+    
+    setMessengerNotification(initialMessengerStatus);
+    setEmailNotification(initialEmailStatus);
+  }, []);
+
+  const handleMessengerToggle = async () => {
+    const newStatus = !messengerNotification;
+    setMessengerNotification(newStatus);
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/set-telegram-notification`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ notification: newStatus ? 1 : 0 })
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка обновления статуса уведомлений в мессенджерах');
+      }
+
+      localStorage.setItem('telegramNotification', newStatus);
+    } catch (error) {
+      console.error('Ошибка обновления статуса уведомлений в мессенджерах:', error);
+      setMessengerNotification(!newStatus); // Revert the state in case of an error
+    }
   };
 
-  const handleEmailToggle = () => {
-    setEmailNotification(!emailNotification);
+  const handleEmailToggle = async () => {
+    const newStatus = !emailNotification;
+    setEmailNotification(newStatus);
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/set-email-notification`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ notification: newStatus ? 1 : 0 })
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка обновления статуса уведомлений по эл. почте');
+      }
+
+      localStorage.setItem('emailNotification', newStatus);
+    } catch (error) {
+      console.error('Ошибка обновления статуса уведомлений по эл. почте:', error);
+      setEmailNotification(!newStatus); // Revert the state in case of an error
+    }
   };
 
   return (
