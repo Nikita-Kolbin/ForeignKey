@@ -32,5 +32,21 @@ services:
       - foreign_key_nw
     command: ./build
 
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl
+    networks:
+      - foreign_key_nw
+    depends_on:
+      - frontend
+
+volumes:
+  foreign_key_volume: {}
+
 networks:
   foreign_key_nw: { }
