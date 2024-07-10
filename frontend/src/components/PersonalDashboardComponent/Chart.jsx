@@ -94,7 +94,7 @@ const Chart = () => {
 
   return (
     <div className="chart-container">
-      <h3>Динамика роста заказов</h3>
+      <h3>Динамика выручки</h3>
       <div>
         <label htmlFor="timeFrameSelector">Выберите временной интервал:</label>
         <select id="timeFrameSelector" value={timeFrame} onChange={handleTimeFrameChange}>
