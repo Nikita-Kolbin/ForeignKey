@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import '../styles/RegisterPage.css'; // Подключаем файл со стилями
 import { API_BASE_URL } from '../components/ApiConfig';
+import useTitle from '../components/customTitle';
 
 const RegisterPage = () => {
   const [registered, setRegistered] = useState(false);
   const [email, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  useTitle('Регистрация');
 
   const handleRegister = async () => {
     try {

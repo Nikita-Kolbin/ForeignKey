@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../components/ApiConfig';
 import "../styles/ClientListPage.css"; // Стили для страницы клиентов
 import NavigationControlPanel from '../components/NavigationControlPanel';
+import useTitle from '../components/customTitle';
 
 const ClientListPage = () => {
   const [showClosedOrders, setShowClosedOrders] = useState(false);
   const [clients, setClients] = useState([]);
   const [alias, setAlias] = useState('');
   const [error, setError] = useState('');
+
+  useTitle('Клиенты')
 
   useEffect(() => {
     const fetchAlias = async () => {

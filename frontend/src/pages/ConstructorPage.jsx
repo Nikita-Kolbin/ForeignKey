@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../components/ApiConfig';
 import NavigationControlPanel from '../components/NavigationControlPanel'; // Импортируем шапку навигации
 import '../styles/ConstructorPage.css'; // Импортируем стили
+import useTitle from '../components/customTitle';
 
 const ConstructorPage = () => {
   const [aliases, setAliases] = useState([]);
@@ -12,6 +13,8 @@ const ConstructorPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [aliasToDelete, setAliasToDelete] = useState('');
   const navigate = useNavigate();
+
+  useTitle('Конструктор сайта');
 
   const fetchAliases = async () => {
     try {

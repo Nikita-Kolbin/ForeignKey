@@ -5,6 +5,7 @@ import AddProductForm from '../components/Product/AddProductForm';
 import '../styles/ProductsPage.css';
 import { useParams } from 'react-router-dom';
 import { API_BASE_URL } from '../components/ApiConfig';
+import useTitle from '../components/customTitle';
 
 const ProductPage = () => {
   const { alias } = useParams();
@@ -19,6 +20,8 @@ const ProductPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+
+  useTitle('Товары и Услуги');
 
   useEffect(() => {
     if (!siteAlias) {

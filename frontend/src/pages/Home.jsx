@@ -4,8 +4,11 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import '../styles/Home.css';
+import useTitle from '../components/customTitle';
 
 const Home = () => {
+  useTitle('Главная страница');
+
   useEffect(() => {
     AOS.init({
       duration: 600, // Установите длительность анимации в 1000 миллисекунд (1 секунда)

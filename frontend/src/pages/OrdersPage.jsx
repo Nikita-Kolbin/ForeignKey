@@ -4,6 +4,7 @@ import "../styles/OrdersPage.css";
 import NavigationControlPanel from '../components/NavigationControlPanel';
 import OrderProductsTable from '../components/Orders/OrderProductsTable';
 import OrderClientData from '../components/Orders/OrderClientData';
+import useTitle from '../components/customTitle';
 
 const OrdersPage = () => {
   const [showClosedOrders, setShowClosedOrders] = useState(false);
@@ -14,6 +15,8 @@ const OrdersPage = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  useTitle('Заказы');
 
   const orderStatuses = [
     { value: 0, label: 'Ожидает подтверждения' },

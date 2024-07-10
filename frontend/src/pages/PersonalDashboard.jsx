@@ -5,6 +5,7 @@ import MessageSender from '../components/PersonalDashboardComponent/MessageSende
 import Chart from '../components/PersonalDashboardComponent/Chart';
 import { API_BASE_URL } from '../components/ApiConfig';
 import '../styles/PersonalDashboard.css';
+import useTitle from '../components/customTitle';
 
 const PersonalDashboard = () => {
   const defaultPhoto = '/Профиль.jpg';
@@ -17,6 +18,8 @@ const PersonalDashboard = () => {
     photo: defaultPhoto,
   });
   const [editMode, setEditMode] = useState(false);
+
+  useTitle('Личный кабинет')
 
   useEffect(() => {
     const fetchUserProfile = async () => {

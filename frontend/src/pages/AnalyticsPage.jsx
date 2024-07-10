@@ -6,8 +6,10 @@ import RevenueChart from '../components/Analitics/RevenueChart';
 import OrdersChart from '../components/Analitics/OrdersChart';
 import RevenueHistogram from '../components/Analitics/RevenueHistogram';
 import "../styles/AnalyticsPage.css";
+import useTitle from '../components/customTitle';
 
 const AnalyticsPage = () => {
+  useTitle('Аналитика');
   return (
     <div>
       <NavigationControlPanel /> {/* Вставляем шапку навигации */}

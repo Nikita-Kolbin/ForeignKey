@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import '../styles/LoginPage.css'; // Подключаем файл со стилями
 import { API_BASE_URL } from '../components/ApiConfig';
+import useTitle from '../components/customTitle';
 
 const LoginPage = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -9,6 +10,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  useTitle('Авторизация');
+  
   const handleLogin = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/sign-in`, {
