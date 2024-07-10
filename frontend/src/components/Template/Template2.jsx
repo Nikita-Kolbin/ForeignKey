@@ -18,7 +18,9 @@ const Template2 = () => {
   const [paymentType, setPaymentType] = useState('наличные');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [telegramName, setTelegramName] = useState('');
-  const [comment, setComment] = useState(''); // New state variable for the comment
+  const [comment, setComment] = useState('');
+  const [emailNotification, setEmailNotification] = useState(false);
+  const [telegramNotification, setTelegramNotification] = useState(false);
 
   useEffect(() => {
     const fetchStyles = async () => {
@@ -103,6 +105,8 @@ const Template2 = () => {
           setPaymentType(profile.payment_type || 'наличные');
           setPhoneNumber(profile.phone || '');
           setTelegramName(profile.telegram || '');
+          setEmailNotification(profile.email_notification || false);
+          setTelegramNotification(profile.telegram_notification || false);
         } else {
           console.error('Ошибка при получении профиля клиента:', data.error);
         }
@@ -184,12 +188,12 @@ const Template2 = () => {
 
   const handleMakeOrder = async () => {
     const token = localStorage.getItem('customerToken');
-  
+
     if (cartItems.length === 0) {
       alert('Корзина пуста. Добавьте товары в корзину перед созданием заказа.');
       return;
     }
-  
+
     try {
       const profileResponse = await fetch(`${API_BASE_URL}/customer/update-profile`, {
         method: 'PUT',
@@ -208,15 +212,15 @@ const Template2 = () => {
           comment: comment // Include comment in the profile update request
         })
       });
-  
+
       const profileData = await profileResponse.json();
-  
+
       if (!profileResponse.ok || profileData.status !== 'OK') {
         console.error('Ошибка при обновлении профиля:', profileData.error);
         alert(`Ошибка при обновлении профиля: ${profileData.error}`);
         return;
       }
-  
+
       const orderResponse = await fetch(`${API_BASE_URL}/order/make`, {
         method: 'POST',
         headers: {
@@ -227,9 +231,9 @@ const Template2 = () => {
           comment: comment // Include comment in the order creation request
         })
       });
-  
+
       const orderData = await orderResponse.json();
-  
+
       if (orderResponse.ok && orderData.status === 'OK') {
         setCartItems([]);
         alert('Заказ успешно создан');
@@ -240,6 +244,58 @@ const Template2 = () => {
     } catch (error) {
       console.error('Ошибка при создании заказа:', error);
       alert('Ошибка при создании заказа. Попробуйте снова позже.');
+    }
+  };
+
+  const handleEmailNotificationChange = async () => {
+    const newStatus = !emailNotification;
+    setEmailNotification(newStatus);
+    const token = localStorage.getItem('customerToken');
+    try {
+      const response = await fetch(`${API_BASE_URL}/customer/set-email-notification`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ notification: newStatus ? 1 : 0 })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status !== 'OK') {
+        console.error('Ошибка при изменении статуса email уведомлений:', data.error);
+        setEmailNotification(!newStatus); // Revert state on error
+      }
+    } catch (error) {
+      console.error('Ошибка при изменении статуса email уведомлений:', error);
+      setEmailNotification(!newStatus); // Revert state on error
+    }
+  };
+
+  const handleTelegramNotificationChange = async () => {
+    const newStatus = !telegramNotification;
+    setTelegramNotification(newStatus);
+    const token = localStorage.getItem('customerToken');
+    try {
+      const response = await fetch(`${API_BASE_URL}/customer/set-telegram-notification`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ notification: newStatus ? 1 : 0 })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.status !== 'OK') {
+        console.error('Ошибка при изменении статуса telegram уведомлений:', data.error);
+        setTelegramNotification(!newStatus); // Revert state on error
+      }
+    } catch (error) {
+      console.error('Ошибка при изменении статуса telegram уведомлений:', error);
+      setTelegramNotification(!newStatus); // Revert state on error
     }
   };
 
@@ -314,6 +370,22 @@ const Template2 = () => {
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+            />
+          </label>
+          <label>
+            Уведомления по email:
+            <input
+              type="checkbox"
+              checked={emailNotification}
+              onChange={handleEmailNotificationChange}
+            />
+          </label>
+          <label>
+            Уведомления по Telegram:
+            <input
+              type="checkbox"
+              checked={telegramNotification}
+              onChange={handleTelegramNotificationChange}
             />
           </label>
           <button onClick={handleMakeOrder}>Сделать заказ</button>
