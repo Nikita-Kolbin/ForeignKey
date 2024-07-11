@@ -101,7 +101,11 @@ const Template2 = () => {
         if (response.ok && data.status === 'OK') {
           const profile = data.profile;
           setDeliveryType(profile.delivery_type || 'курьер');
-          setFullName(`${profile.last_name} ${profile.first_name} ${profile.father_name}`);
+          let fullName = '';
+          if (profile.last_name) fullName += profile.last_name;
+          if (profile.first_name) fullName += fullName ? ` ${profile.first_name}` : profile.first_name;
+          if (profile.father_name) fullName += fullName ? ` ${profile.father_name}` : profile.father_name;
+          setFullName(fullName);
           setPaymentType(profile.payment_type || 'наличные');
           setPhoneNumber(profile.phone || '');
           setTelegramName(profile.telegram || '');
