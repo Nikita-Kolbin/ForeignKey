@@ -12,8 +12,31 @@ func (s *Storage) initWebsites() error {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		admin_id INTEGER,
 		alias TEXT UNIQUE,
-		background_color TEXT,
-		font TEXT,
+		
+		background_color TEXT DEFAULT 'white',
+		text_color TEXT DEFAULT 'black',
+		font TEXT DEFAULT 'Arial',
+		
+		about_one TEXT DEFAULT '',
+		about_two TEXT DEFAULT '',
+		about_three TEXT DEFAULT '',
+		about_four TEXT DEFAULT '',
+		about_five TEXT DEFAULT '',
+		about_six TEXT DEFAULT '',
+		about_image_one INTEGER DEFAULT 0,
+		about_image_two INTEGER DEFAULT 0,
+		about_image_three INTEGER DEFAULT 0,
+		about_image_four INTEGER DEFAULT 0,
+		
+		new_product_one TEXT DEFAULT '',
+		product_one TEXT DEFAULT '',
+		
+		contact_one TEXT DEFAULT '',
+		contact_two TEXT DEFAULT '',
+		contact_three TEXT DEFAULT '',
+		contact_four TEXT DEFAULT '',
+		contact_five TEXT DEFAULT '',
+		
 	    FOREIGN KEY (admin_id) REFERENCES admins (id)
 	);
 	`
@@ -37,9 +60,9 @@ func (s *Storage) CreateWebsite(alias string, adminId int) error {
 		return storage.ErrAdminHaveWebsite
 	}
 
-	q := `INSERT INTO websites (alias, admin_id, background_color, font) VALUES (?, ?, ?, ?)`
+	q := `INSERT INTO websites (alias, admin_id) VALUES (?, ?)`
 
-	_, err = s.db.Exec(q, alias, adminId, storage.DefaultBackgroundColor, storage.DefaultFont)
+	_, err = s.db.Exec(q, alias, adminId)
 	if err != nil {
 		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
 			return fmt.Errorf("%s: %w", op, storage.ErrAliasTaken)
@@ -115,12 +138,28 @@ func (s *Storage) DeleteWebsite(alias string) error {
 	return nil
 }
 
-func (s *Storage) UpdateStyle(alias, backgroundColor, font string) error {
+func (s *Storage) UpdateStyle(alias string, style storage.WebsiteStyle) error {
 	const op = "storage.sqlite.UpdateStyle"
 
-	q := `UPDATE websites SET background_color = ?, font = ? WHERE alias = ?`
+	q := `UPDATE websites SET background_color = ?, text_color = ?, font = ?,
+    	about_one = ?, about_two = ?, about_three = ?, about_four = ?, about_five = ?, about_six = ?,
+    	about_image_one = ?, about_image_two = ?, about_image_three = ?, about_image_four = ?,
+    	new_product_one = ?, product_one = ?,
+    	contact_one = ?, contact_two = ?, contact_three = ?, contact_four = ?, contact_five = ?
+    WHERE alias = ?`
 
-	_, err := s.db.Exec(q, backgroundColor, font, alias)
+	_, err := s.db.Exec(
+		q,
+		style.BackgroundColor, style.TextColor, style.Font,
+		style.AboutOne, style.AboutTwo, style.AboutThree,
+		style.AboutFour, style.AboutFive, style.AboutSix,
+		style.AboutImageOne, style.AboutImageTwo,
+		style.AboutImageThree, style.AboutImageFour,
+		style.NewProductOne, style.ProductOne,
+		style.ContactOne, style.ContactTwo, style.ContactThree,
+		style.ContactFour, style.ContactFive,
+		alias,
+	)
 
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
@@ -129,16 +168,32 @@ func (s *Storage) UpdateStyle(alias, backgroundColor, font string) error {
 	return nil
 }
 
-func (s *Storage) GetWebsiteStyle(alias string) (backgroundColor, font string, err error) {
+func (s *Storage) GetWebsiteStyle(alias string) (style *storage.WebsiteStyle, err error) {
 	const op = "storage.sqlite.GetWebsiteStyle"
 
-	q := `SELECT background_color, font FROM websites WHERE alias=?`
+	q := `SELECT background_color, text_color, font, 
+        about_one, about_two, about_three, about_four, about_five, about_six, 
+        about_image_one, about_image_two, about_image_three, about_image_four, 
+        new_product_one, product_one, 
+        contact_one, contact_two, contact_three, contact_four, contact_five 
+	FROM websites WHERE alias=?`
 
 	row := s.db.QueryRow(q, alias)
 
-	if err = row.Scan(&backgroundColor, &font); err != nil {
-		return "", "", fmt.Errorf("%s: %w", op, err)
+	style = &storage.WebsiteStyle{}
+	err = row.Scan(
+		&style.BackgroundColor, &style.TextColor, &style.Font,
+		&style.AboutOne, &style.AboutTwo, &style.AboutThree,
+		&style.AboutFour, &style.AboutFive, &style.AboutSix,
+		&style.AboutImageOne, &style.AboutImageTwo,
+		&style.AboutImageThree, &style.AboutImageFour,
+		&style.NewProductOne, &style.ProductOne,
+		&style.ContactOne, &style.ContactTwo, &style.ContactThree,
+		&style.ContactFour, &style.ContactFive,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return backgroundColor, font, nil
+	return style, nil
 }

@@ -2,6 +2,7 @@ package website
 
 import (
 	"ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -10,13 +11,12 @@ import (
 )
 
 type StyleGetter interface {
-	GetWebsiteStyle(alias string) (backgroundColor, font string, err error)
+	GetWebsiteStyle(alias string) (style *storage.WebsiteStyle, err error)
 }
 
 type GetStyleResponse struct {
 	response.Response
-	BackgroundColor string `json:"background_color"`
-	Font            string `json:"font"`
+	Style *storage.WebsiteStyle `json:"style"`
 }
 
 // NewGetStyle godoc
@@ -37,7 +37,7 @@ func NewGetStyle(pg StyleGetter, log *slog.Logger) http.HandlerFunc {
 
 		alias := chi.URLParam(r, "alias")
 
-		backgroundColor, font, err := pg.GetWebsiteStyle(alias)
+		style, err := pg.GetWebsiteStyle(alias)
 		if err != nil {
 			log.Error("failed to get style", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
@@ -47,22 +47,20 @@ func NewGetStyle(pg StyleGetter, log *slog.Logger) http.HandlerFunc {
 
 		log.Info("product given", slog.String("website alias", alias))
 
-		render.JSON(w, r, responseOk(backgroundColor, font))
+		render.JSON(w, r, responseOk(style))
 	}
 }
 
 func responseError(msg string) GetStyleResponse {
 	return GetStyleResponse{
 		response.Error(msg),
-		"",
-		"",
+		nil,
 	}
 }
 
-func responseOk(bc, f string) GetStyleResponse {
+func responseOk(style *storage.WebsiteStyle) GetStyleResponse {
 	return GetStyleResponse{
 		response.OK(),
-		bc,
-		f,
+		style,
 	}
 }

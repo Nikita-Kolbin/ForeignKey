@@ -1,6 +1,8 @@
 package storage
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrEmailRegistered     = errors.New("email is already registered")
@@ -11,11 +13,6 @@ var (
 	ErrAdminHaveWebsite    = errors.New("admin already have website")
 	ErrInvalidActive       = errors.New("invalid active status")
 	ErrInvalidNotification = errors.New("invalid notification status")
-)
-
-const (
-	DefaultBackgroundColor = "white"
-	DefaultFont            = "Arial"
 )
 
 type Admin struct {
@@ -78,6 +75,32 @@ type Order struct {
 	Status     int         `json:"status"`
 	OrderItems []OrderItem `json:"order_items"`
 	Comment    string      `json:"comment"`
+}
+
+type WebsiteStyle struct {
+	BackgroundColor string `json:"background_color"`
+	TextColor       string `json:"text_color"`
+	Font            string `json:"font"`
+
+	AboutOne        string `json:"about_one"`
+	AboutTwo        string `json:"about_two"`
+	AboutThree      string `json:"about_three"`
+	AboutFour       string `json:"about_four"`
+	AboutFive       string `json:"about_five"`
+	AboutSix        string `json:"about_six"`
+	AboutImageOne   int    `json:"about_image_one"`
+	AboutImageTwo   int    `json:"about_image_two"`
+	AboutImageThree int    `json:"about_image_three"`
+	AboutImageFour  int    `json:"about_image_four"`
+
+	NewProductOne string `json:"new_product_ont"`
+	ProductOne    string `json:"product_ont"`
+
+	ContactOne   string `json:"contact_one"`
+	ContactTwo   string `json:"contact_two"`
+	ContactThree string `json:"contact_three"`
+	ContactFour  string `json:"contact_four"`
+	ContactFive  string `json:"contact_five"`
 }
 
 const (

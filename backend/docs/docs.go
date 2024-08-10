@@ -1731,6 +1731,71 @@ const docTemplate = `{
                 }
             }
         },
+        "storage.WebsiteStyle": {
+            "type": "object",
+            "properties": {
+                "about_five": {
+                    "type": "string"
+                },
+                "about_four": {
+                    "type": "string"
+                },
+                "about_image_four": {
+                    "type": "integer"
+                },
+                "about_image_one": {
+                    "type": "integer"
+                },
+                "about_image_three": {
+                    "type": "integer"
+                },
+                "about_image_two": {
+                    "type": "integer"
+                },
+                "about_one": {
+                    "type": "string"
+                },
+                "about_six": {
+                    "type": "string"
+                },
+                "about_three": {
+                    "type": "string"
+                },
+                "about_two": {
+                    "type": "string"
+                },
+                "background_color": {
+                    "type": "string"
+                },
+                "contact_five": {
+                    "type": "string"
+                },
+                "contact_four": {
+                    "type": "string"
+                },
+                "contact_one": {
+                    "type": "string"
+                },
+                "contact_three": {
+                    "type": "string"
+                },
+                "contact_two": {
+                    "type": "string"
+                },
+                "font": {
+                    "type": "string"
+                },
+                "new_product_ont": {
+                    "type": "string"
+                },
+                "product_ont": {
+                    "type": "string"
+                },
+                "text_color": {
+                    "type": "string"
+                }
+            }
+        },
         "website.AliasesResponse": {
             "type": "object",
             "properties": {
@@ -1759,17 +1824,14 @@ const docTemplate = `{
         "website.GetStyleResponse": {
             "type": "object",
             "properties": {
-                "background_color": {
-                    "type": "string"
-                },
                 "error": {
-                    "type": "string"
-                },
-                "font": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
+                },
+                "style": {
+                    "$ref": "#/definitions/storage.WebsiteStyle"
                 }
             }
         },
@@ -1779,11 +1841,8 @@ const docTemplate = `{
                 "alias": {
                     "type": "string"
                 },
-                "background_color": {
-                    "type": "string"
-                },
-                "font": {
-                    "type": "string"
+                "style": {
+                    "$ref": "#/definitions/storage.WebsiteStyle"
                 }
             }
         }

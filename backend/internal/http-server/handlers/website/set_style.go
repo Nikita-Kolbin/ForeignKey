@@ -3,6 +3,7 @@ package website
 import (
 	"ForeignKey/internal/http-server/jwt_token"
 	"ForeignKey/internal/http-server/response"
+	"ForeignKey/internal/storage"
 	"errors"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -12,14 +13,13 @@ import (
 )
 
 type StyleChanger interface {
-	UpdateStyle(alias, backgroundColor, font string) error
+	UpdateStyle(alias string, style storage.WebsiteStyle) error
 	GetWebsite(alias string) (websiteId, adminId int, err error)
 }
 
 type StyleRequest struct {
-	Alias           string `json:"alias"`
-	BackgroundColor string `json:"background_color"`
-	Font            string `json:"font"`
+	Alias string               `json:"alias"`
+	Style storage.WebsiteStyle `json:"style"`
 }
 
 // NewSetStyle godoc
@@ -93,7 +93,7 @@ func NewSetStyle(sc StyleChanger, log *slog.Logger) http.HandlerFunc {
 			return
 		}
 
-		err = sc.UpdateStyle(req.Alias, req.BackgroundColor, req.Font)
+		err = sc.UpdateStyle(req.Alias, req.Style)
 		if err != nil {
 			log.Error("failed to change style", slog.String("err", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
