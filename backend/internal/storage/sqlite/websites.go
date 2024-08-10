@@ -17,6 +17,9 @@ func (s *Storage) initWebsites() error {
 		text_color TEXT DEFAULT 'black',
 		font TEXT DEFAULT 'Arial',
 		
+		main_one TEXT DEFAULT '',
+		main_two TEXT DEFAULT '',
+		
 		about_one TEXT DEFAULT '',
 		about_two TEXT DEFAULT '',
 		about_three TEXT DEFAULT '',
@@ -141,7 +144,8 @@ func (s *Storage) DeleteWebsite(alias string) error {
 func (s *Storage) UpdateStyle(alias string, style storage.WebsiteStyle) error {
 	const op = "storage.sqlite.UpdateStyle"
 
-	q := `UPDATE websites SET background_color = ?, text_color = ?, font = ?,
+	q := `UPDATE websites SET main_one = ?, main_two = ?,
+        background_color = ?, text_color = ?, font = ?,
     	about_one = ?, about_two = ?, about_three = ?, about_four = ?, about_five = ?, about_six = ?,
     	about_image_one = ?, about_image_two = ?, about_image_three = ?, about_image_four = ?,
     	new_product_one = ?, product_one = ?,
@@ -150,6 +154,7 @@ func (s *Storage) UpdateStyle(alias string, style storage.WebsiteStyle) error {
 
 	_, err := s.db.Exec(
 		q,
+		style.MainOne, style.MainTwo,
 		style.BackgroundColor, style.TextColor, style.Font,
 		style.AboutOne, style.AboutTwo, style.AboutThree,
 		style.AboutFour, style.AboutFive, style.AboutSix,
@@ -171,7 +176,7 @@ func (s *Storage) UpdateStyle(alias string, style storage.WebsiteStyle) error {
 func (s *Storage) GetWebsiteStyle(alias string) (style *storage.WebsiteStyle, err error) {
 	const op = "storage.sqlite.GetWebsiteStyle"
 
-	q := `SELECT background_color, text_color, font, 
+	q := `SELECT background_color, text_color, font, main_one, main_two,
         about_one, about_two, about_three, about_four, about_five, about_six, 
         about_image_one, about_image_two, about_image_three, about_image_four, 
         new_product_one, product_one, 
@@ -183,6 +188,7 @@ func (s *Storage) GetWebsiteStyle(alias string) (style *storage.WebsiteStyle, er
 	style = &storage.WebsiteStyle{}
 	err = row.Scan(
 		&style.BackgroundColor, &style.TextColor, &style.Font,
+		&style.MainOne, &style.MainTwo,
 		&style.AboutOne, &style.AboutTwo, &style.AboutThree,
 		&style.AboutFour, &style.AboutFive, &style.AboutSix,
 		&style.AboutImageOne, &style.AboutImageTwo,

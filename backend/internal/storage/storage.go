@@ -82,6 +82,9 @@ type WebsiteStyle struct {
 	TextColor       string `json:"text_color"`
 	Font            string `json:"font"`
 
+	MainOne string `json:"main_one"`
+	MainTwo string `json:"main_two"`
+
 	AboutOne        string `json:"about_one"`
 	AboutTwo        string `json:"about_two"`
 	AboutThree      string `json:"about_three"`
@@ -93,8 +96,8 @@ type WebsiteStyle struct {
 	AboutImageThree int    `json:"about_image_three"`
 	AboutImageFour  int    `json:"about_image_four"`
 
-	NewProductOne string `json:"new_product_ont"`
-	ProductOne    string `json:"product_ont"`
+	NewProductOne string `json:"new_product_one"`
+	ProductOne    string `json:"product_one"`
 
 	ContactOne   string `json:"contact_one"`
 	ContactTwo   string `json:"contact_two"`

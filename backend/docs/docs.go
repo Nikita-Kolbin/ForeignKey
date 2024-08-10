@@ -1785,10 +1785,16 @@ const docTemplate = `{
                 "font": {
                     "type": "string"
                 },
-                "new_product_ont": {
+                "main_one": {
                     "type": "string"
                 },
-                "product_ont": {
+                "main_two": {
+                    "type": "string"
+                },
+                "new_product_one": {
+                    "type": "string"
+                },
+                "product_one": {
                     "type": "string"
                 },
                 "text_color": {
